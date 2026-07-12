@@ -7,6 +7,7 @@ For the MVP, the product has one main deliverable: a structured compliance revie
 The report must be formatted for client understanding, not only for technical completeness.
 
 See also: [Report Contract](report-contract.md)
+See also: [Output Taxonomy](output-taxonomy.md)
 
 ## Required Sections
 
