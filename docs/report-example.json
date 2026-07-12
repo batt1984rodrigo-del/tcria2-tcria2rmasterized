@@ -1,0 +1,136 @@
+{
+  "report_title": "Compliance Review Report - Procurement And Vendor Documentation",
+  "company_name": "Atlas Servicos Corporativos S.A.",
+  "batch_name": "Procurement Batch 2026 Q2",
+  "report_id": "TCRIA-CR-2026-07-001",
+  "generated_at": "2026-07-12 15:30 BRT",
+  "rule_set_name": "Corporate Procurement Compliance v1",
+  "documents_reviewed": 47,
+  "critical_count": 2,
+  "relevant_count": 4,
+  "informational_count": 3,
+  "overall_status": "Attention Required",
+  "overall_conclusion": "The reviewed batch shows a documented procurement process, but the current evidence is not sufficient to support a clean compliance conclusion. The main gaps are missing approval trails, incomplete vendor due diligence support, and inconsistent contract exception records.",
+  "immediate_priorities": [
+    "Recover approval evidence for contracts signed above the delegated threshold.",
+    "Complete vendor due diligence support for suppliers marked as strategic.",
+    "Regularize exception records linked to emergency procurement requests."
+  ],
+  "scope_description": "Review of procurement and vendor management documents related to contract approvals, vendor onboarding, and exception handling for the second quarter of 2026.",
+  "source_description": "Uploaded batch from procurement shared drive",
+  "document_types": "contracts, approval forms, vendor onboarding files, exception memos, email exports",
+  "business_area": "Procurement and Vendor Management",
+  "period_covered": "2026-04-01 to 2026-06-30",
+  "checks": [
+    "approval trail completeness",
+    "vendor due diligence support",
+    "exception justification records",
+    "contract conformity against internal thresholds"
+  ],
+  "rules_summary": "The review rules classify findings by evidence completeness, traceability, approval support, and conformity with documented procurement controls.",
+  "severity_scale": {
+    "critical": "Evidence indicates a material compliance gap requiring immediate review.",
+    "relevant": "Evidence indicates a meaningful control weakness or unresolved conformity gap.",
+    "attention": "Evidence suggests a moderate issue that should be clarified or regularized.",
+    "informational": "Evidence indicates a point worth tracking without immediate escalation."
+  },
+  "findings": [
+    {
+      "finding_id": "F-01",
+      "title": "Missing approval trail for high-value contract amendments",
+      "compliance_area": "Approval Governance",
+      "severity": "Critical",
+      "conformity_status": "Noncompliant",
+      "confidence": "High",
+      "what_identified": "Three contract amendments above the delegated threshold were located without signed approval support in the submitted batch.",
+      "why_matters": "The absence of approval evidence weakens traceability and creates exposure to unauthorized commercial commitment.",
+      "supporting_evidence": [
+        "Contract amendment file AM-17 with no approval attachment.",
+        "Approval index spreadsheet marks the record as pending.",
+        "Email chain references urgency but not final authorization."
+      ],
+      "follow_up": [
+        "Retrieve signed approval records or formal ratification evidence.",
+        "Confirm whether the contracts entered execution before approval closure."
+      ]
+    },
+    {
+      "finding_id": "F-02",
+      "title": "Incomplete vendor due diligence support for strategic suppliers",
+      "compliance_area": "Third-Party Compliance",
+      "severity": "Relevant",
+      "conformity_status": "Partially Compliant",
+      "confidence": "High",
+      "what_identified": "Five strategic supplier files include onboarding forms but do not contain the full due diligence support referenced by the checklist.",
+      "why_matters": "Incomplete due diligence weakens evidence of onboarding conformity and reduces defensibility of vendor approval decisions.",
+      "supporting_evidence": [
+        "Checklist marks tax and sanction review as required.",
+        "Three folders contain only summary forms without source documents.",
+        "Vendor master sheet lists suppliers as approved."
+      ],
+      "follow_up": [
+        "Request the missing due diligence attachments from procurement operations.",
+        "Confirm whether approval was granted with an exception process."
+      ]
+    },
+    {
+      "finding_id": "F-03",
+      "title": "Emergency procurement exceptions are documented inconsistently",
+      "compliance_area": "Exception Management",
+      "severity": "Attention",
+      "conformity_status": "Inconclusive",
+      "confidence": "Medium",
+      "what_identified": "Exception memos exist for part of the emergency procurement set, but the rationale and approval pattern are not consistent across documents.",
+      "why_matters": "Inconsistent exception records make it difficult to determine whether nonstandard procurement steps were justified and approved correctly.",
+      "supporting_evidence": [
+        "Two memos use the standard exception form.",
+        "One request is supported only by email language.",
+        "No single register consolidates all emergency exceptions."
+      ],
+      "follow_up": [
+        "Create a reconciled list of all emergency exceptions in the batch.",
+        "Verify whether each exception has a matching approval record."
+      ]
+    }
+  ],
+  "evidence_register": [
+    {
+      "evidence_id": "E-01",
+      "document": "AM-17 Contract Amendment.pdf",
+      "reference": "Pages 2-4",
+      "why_it_matters": "Contains amendment terms but no attached approval support."
+    },
+    {
+      "evidence_id": "E-02",
+      "document": "Approval Index Q2.xlsx",
+      "reference": "Row 118",
+      "why_it_matters": "Flags approval record as pending."
+    },
+    {
+      "evidence_id": "E-03",
+      "document": "Vendor Checklist Pack.zip",
+      "reference": "Supplier folders S-04 to S-08",
+      "why_it_matters": "Shows missing due diligence attachments for strategic suppliers."
+    }
+  ],
+  "unresolved_points": [
+    "The batch does not confirm whether missing approval evidence exists outside the submitted scope.",
+    "Two vendor files contain placeholders that suggest pending uploads."
+  ],
+  "limits": [
+    "The review is limited to the submitted document batch.",
+    "No direct system-of-record validation was performed.",
+    "Unreadable scans may hide additional supporting evidence."
+  ],
+  "next_priorities": [
+    "Recover approval support for high-value amendments.",
+    "Close due diligence evidence gaps for strategic suppliers.",
+    "Normalize exception records and reconcile them against approvals."
+  ],
+  "annexes": [
+    "Detailed evidence register",
+    "Full document inventory",
+    "Rule set reference"
+  ]
+}
+
