@@ -3,440 +3,389 @@ from __future__ import annotations
 
 import argparse
 import json
+from collections import Counter
 from pathlib import Path
 from typing import Any
-
-from reportlab.lib import colors
-from reportlab.lib.pagesizes import A4
-from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
-from reportlab.lib.units import mm
-from reportlab.platypus import KeepTogether, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_INPUT = ROOT / "examples" / "legacy" / "sanitized-strict-audit.json"
-DEFAULT_MD = ROOT / "output" / "legacy" / "legacy-audit-summary.md"
-DEFAULT_PDF = ROOT / "output" / "pdf" / "legacy-audit-summary.pdf"
+DEFAULT_OUTPUT = ROOT / "output" / "legacy" / "legacy-audit-summary.md"
+PARTIAL_TEXT_QUALITIES = {"medium", "low"}
+INSUFFICIENT_TEXT_QUALITIES = {"low", "very_low", "insufficient", "empty"}
+PRIMARY_GATE_ORDER = ["complianceGate", "prescriptiveGate", "traceabilityCheck"]
 
 
 def load_payload(path: Path) -> dict[str, Any]:
-    data = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(data, dict):
-        raise ValueError("Legacy payload must be a JSON object.")
-    return data
+    raw = json.loads(path.read_text(encoding="utf-8"))
+    if isinstance(raw, dict):
+        return raw
+    if isinstance(raw, list):
+        items = [item for item in raw if isinstance(item, dict)]
+        classification_counts = Counter(normalized_classification(item) for item in items)
+        return {
+            "generated_at": "unknown",
+            "audit_basis": "legacy-list-normalized-for-coverage-summary",
+            "input_path": str(path),
+            "mode": "legacy-list-normalized",
+            "compliance_gate_mode": "legacy-list-normalized",
+            "total_files_scanned": len(items),
+            "accusation_set_count": 0,
+            "classification_counts": dict(classification_counts),
+            "accusation_set": [],
+            "non_accusation_set": items,
+        }
+    raise ValueError("Legacy payload must be a JSON object or list of legacy items.")
 
 
-def safe(value: Any) -> str:
-    text = str(value)
-    return (
-        text.replace("&", "&amp;")
-        .replace("<", "&lt;")
-        .replace(">", "&gt;")
-        .replace("\u2014", "-")
-        .replace("\u2013", "-")
-    )
-
-
-def all_items(payload: dict[str, Any]) -> list[dict[str, Any]]:
+def legacy_items(payload: dict[str, Any]) -> list[dict[str, Any]]:
     accusation = payload.get("accusation_set") or []
     non_accusation = payload.get("non_accusation_set") or []
-    return [item for item in accusation + non_accusation if isinstance(item, dict)]
+    items = [item for item in accusation + non_accusation if isinstance(item, dict)]
+    if items:
+        return items
+    fallback = payload.get("items") or []
+    return [item for item in fallback if isinstance(item, dict)]
 
 
-def relative_name(item: dict[str, Any]) -> str:
-    path = item.get("file_path") or item.get("file_name") or "unknown-file"
-    return str(path).split("/sanitized/")[-1].split("/")[-1]
+def normalized_text(value: Any, default: str = "unknown") -> str:
+    text = str(value or "").strip()
+    return text if text else default
 
 
-def count_stats(items: list[dict[str, Any]], payload: dict[str, Any]) -> dict[str, int]:
-    read_count = 0
-    unread_count = 0
-    blocked_count = 0
-    partial_count = 0
+def normalized_classification(item: dict[str, Any]) -> str:
+    return normalized_text(item.get("classification"), "UNCLASSIFIED_LEGACY_ITEM").upper()
+
+
+def normalized_extraction_status(item: dict[str, Any]) -> str:
+    status = item.get("extraction_status")
+    if status:
+        return normalized_text(status).lower()
+    if normalized_classification(item) == "UNREADABLE":
+        return "unreadable_or_empty"
+    return "unknown"
+
+
+def normalized_text_quality(item: dict[str, Any]) -> str:
+    quality = item.get("text_quality") or item.get("text_extraction_quality")
+    return normalized_text(quality).lower()
+
+
+def normalized_outcome(item: dict[str, Any]) -> str:
+    return normalized_text(item.get("overall_outcome"), "NOT_REPORTED")
+
+
+def file_name(item: dict[str, Any]) -> str:
+    name = item.get("file_name")
+    if name:
+        return str(name)
+    path = item.get("file_path")
+    if path:
+        return Path(str(path)).name
+    return "unknown-file"
+
+
+def extractable_text_chars(item: dict[str, Any]) -> int:
+    value = item.get("extractable_text_chars")
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return 0
+
+
+def is_unreadable(item: dict[str, Any]) -> bool:
+    status = normalized_extraction_status(item)
+    classification = normalized_classification(item)
+    return status in {"unreadable", "unreadable_or_empty", "error"} or classification == "UNREADABLE"
+
+
+def is_partially_usable(item: dict[str, Any]) -> bool:
+    if is_unreadable(item):
+        return False
+    outcome = normalized_outcome(item).upper()
+    quality = normalized_text_quality(item)
+    return "PARTIAL_PASS" in outcome or (normalized_extraction_status(item) == "ok" and quality in PARTIAL_TEXT_QUALITIES)
+
+
+def has_insufficient_text(item: dict[str, Any]) -> bool:
+    if normalized_extraction_status(item) == "unreadable_or_empty":
+        return True
+    if extractable_text_chars(item) == 0:
+        return True
+    return normalized_text_quality(item) in INSUFFICIENT_TEXT_QUALITIES
+
+
+def classification_counts(payload: dict[str, Any], items: list[dict[str, Any]]) -> dict[str, int]:
+    raw_counts = payload.get("classification_counts")
+    if isinstance(raw_counts, dict) and raw_counts:
+        return {str(key): int(value) for key, value in raw_counts.items()}
+    counts = Counter(normalized_classification(item) for item in items)
+    return dict(counts)
+
+
+def document_outcome_counts(items: list[dict[str, Any]]) -> dict[str, int]:
+    counts = {"PARTIAL_PASS": 0, "BLOCKED": 0, "PASS": 0}
     for item in items:
-        extraction_status = str(item.get("extraction_status") or "").lower()
-        text_quality = str(item.get("text_quality") or "").lower()
-        outcome = str(item.get("overall_outcome") or "")
-        classification = str(item.get("classification") or "").upper()
-        if extraction_status == "ok":
-            read_count += 1
-        if extraction_status != "ok" or "UNREADABLE" in classification:
-            unread_count += 1
-        if "BLOCKED" in outcome.upper():
-            blocked_count += 1
-        if extraction_status == "ok" and text_quality in {"low", "medium"}:
-            partial_count += 1
+        outcome = normalized_outcome(item).upper()
+        if "PARTIAL_PASS" in outcome:
+            counts["PARTIAL_PASS"] += 1
+        elif "BLOCKED" in outcome:
+            counts["BLOCKED"] += 1
+        elif outcome == "PASS" or outcome.startswith("PASS "):
+            counts["PASS"] += 1
+    return counts
 
+
+def gate_status_counts(items: list[dict[str, Any]]) -> dict[str, int]:
+    counts = {"WARN": 0, "NOT_EVALUATED": 0}
+    for item in items:
+        gates = item.get("gates")
+        if not isinstance(gates, dict):
+            continue
+        for gate in gates.values():
+            if not isinstance(gate, dict):
+                continue
+            status = normalized_text(gate.get("status")).upper()
+            if status in counts:
+                counts[status] += 1
+    return counts
+
+
+def summarize_gates(item: dict[str, Any]) -> str:
+    gates = item.get("gates")
+    if not isinstance(gates, dict) or not gates:
+        return "not exposed in legacy item"
+    ordered_names = [name for name in PRIMARY_GATE_ORDER if name in gates]
+    ordered_names.extend(sorted(name for name in gates if name not in ordered_names))
+    parts: list[str] = []
+    for name in ordered_names:
+        gate = gates.get(name)
+        if not isinstance(gate, dict):
+            continue
+        status = normalized_text(gate.get("status")).upper()
+        parts.append(f"{name}={status}")
+    return "; ".join(parts) if parts else "not exposed in legacy item"
+
+
+def aggregate_counter(value: Any, counter: Counter[str]) -> None:
+    if isinstance(value, dict):
+        for key, item_value in value.items():
+            try:
+                counter[str(key)] += int(item_value)
+            except (TypeError, ValueError):
+                counter[str(key)] += 1
+        return
+    if isinstance(value, list):
+        for entry in value:
+            text = str(entry).strip()
+            if text:
+                counter[text] += 1
+        return
+    text = str(value or "").strip()
+    if text:
+        counter[text] += 1
+
+
+def flatten_scalar_list(value: Any) -> list[str]:
+    if isinstance(value, list):
+        return [str(entry).strip() for entry in value if str(entry).strip()]
+    if isinstance(value, dict):
+        return [str(key).strip() for key, item_value in value.items() if item_value]
+    text = str(value or "").strip()
+    return [text] if text else []
+
+
+def pix_total(value: Any) -> int:
+    if isinstance(value, bool):
+        return int(value)
+    if isinstance(value, int):
+        return value
+    if isinstance(value, float):
+        return int(value)
+    if isinstance(value, str):
+        return 1 if value.strip() else 0
+    if isinstance(value, list):
+        return sum(pix_total(entry) for entry in value) or len(value)
+    if isinstance(value, dict):
+        return sum(pix_total(entry) for entry in value.values()) or len(value)
+    return 0
+
+
+def aggregate_signals(items: list[dict[str, Any]]) -> dict[str, Any]:
+    dates: list[str] = []
+    currency_values: list[str] = []
+    evidence_markers: Counter[str] = Counter()
+    accusation_terms: Counter[str] = Counter()
+    pix_mentions_total = 0
+    pix_documents = 0
+
+    for item in items:
+        signals = item.get("key_signals")
+        if not isinstance(signals, dict):
+            continue
+        dates.extend(flatten_scalar_list(signals.get("dates_found")))
+        currency_values.extend(flatten_scalar_list(signals.get("currency_values_found")))
+        aggregate_counter(signals.get("evidence_marker_hits") or {}, evidence_markers)
+        aggregate_counter(signals.get("accusation_keyword_hits") or {}, accusation_terms)
+        pix_value = signals.get("pix_mentions")
+        total = pix_total(pix_value)
+        if total > 0:
+            pix_mentions_total += total
+            pix_documents += 1
+
+    unique_dates = sorted(dict.fromkeys(dates))
+    unique_currency_values = list(dict.fromkeys(currency_values))
     return {
-        "total_files": int(payload.get("total_files_scanned") or len(items)),
-        "files_read": read_count,
-        "files_unread": unread_count,
-        "files_blocked": blocked_count,
-        "files_partially_read": partial_count,
+        "dates_found": unique_dates,
+        "currency_values_found": unique_currency_values,
+        "pix_mentions_total": pix_mentions_total,
+        "pix_documents": pix_documents,
+        "evidence_markers": evidence_markers,
+        "accusation_terms": accusation_terms,
     }
 
 
-def severity_rank(item: dict[str, Any]) -> tuple[int, str]:
-    outcome = str(item.get("overall_outcome") or "").upper()
-    classification = str(item.get("classification") or "").upper()
-    if "BLOCKED" in outcome:
-        return (0, relative_name(item))
-    if "PARTIAL" in outcome:
-        return (1, relative_name(item))
-    if "UNREADABLE" in classification:
-        return (2, relative_name(item))
-    return (3, relative_name(item))
+def format_counter(counter: Counter[str]) -> str:
+    if not counter:
+        return "nenhum marcador agregado"
+    parts = [f"{key}={counter[key]}" for key in sorted(counter, key=lambda value: (-counter[value], value))]
+    return ", ".join(parts)
 
 
-def collect_findings(items: list[dict[str, Any]], limit: int = 5) -> list[dict[str, Any]]:
-    findings: list[dict[str, Any]] = []
-    for item in sorted(items, key=severity_rank):
-        outcome = str(item.get("overall_outcome") or "")
-        classification = str(item.get("classification") or "")
-        reasons = item.get("classification_reasons") or []
-        if outcome or classification:
-            findings.append(
-                {
-                    "title": relative_name(item),
-                    "status": outcome or classification,
-                    "summary": str(item.get("summary") or "No summary provided in the legacy payload."),
-                    "reasons": [str(reason) for reason in reasons[:3]],
-                }
-            )
-        if len(findings) >= limit:
-            break
-    return findings
+def format_list(values: list[str], empty_text: str) -> str:
+    return ", ".join(values) if values else empty_text
 
 
-def collect_evidence(items: list[dict[str, Any]], limit: int = 5) -> list[dict[str, Any]]:
-    evidence: list[dict[str, Any]] = []
-    for item in items:
-        classification = str(item.get("classification") or "").upper()
-        signal_hits = (item.get("key_signals") or {}).get("evidence_marker_hits") or {}
-        if "SUPPORTING_EVIDENCE" in classification or signal_hits:
-            detail = ", ".join(f"{k}={v}" for k, v in list(signal_hits.items())[:3]) or "supporting evidence markers present"
-            evidence.append(
-                {
-                    "title": relative_name(item),
-                    "classification": classification or "UNKNOWN",
-                    "detail": detail,
-                    "summary": str(item.get("summary") or "No summary provided in the legacy payload."),
-                }
-            )
-        if len(evidence) >= limit:
-            break
-    return evidence
-
-
-def collect_limits(items: list[dict[str, Any]], stats: dict[str, int]) -> list[str]:
-    limits: list[str] = []
-    if stats["files_unread"] > 0:
-        limits.append(f"{stats['files_unread']} file(s) could not be read reliably from the legacy batch.")
-    if stats["files_partially_read"] > 0:
-        limits.append(f"{stats['files_partially_read']} file(s) were read with only low or medium extraction quality.")
-    if any(item.get("gates") is None for item in items):
-        limits.append("Some legacy items do not expose gate details in a consistent way.")
-    limits.append("This adapted report summarizes a legacy payload and does not re-run the original engine.")
-    return limits
-
-
-def build_summary(payload: dict[str, Any]) -> dict[str, Any]:
-    items = all_items(payload)
-    stats = count_stats(items, payload)
-    findings = collect_findings(items)
-    evidence = collect_evidence(items)
-    limits = collect_limits(items, stats)
-    top_issue = findings[0]["summary"] if findings else "No major finding could be extracted from the legacy payload."
+def build_report(payload: dict[str, Any]) -> dict[str, Any]:
+    items = legacy_items(payload)
+    gate_counts = gate_status_counts(items)
+    outcomes = document_outcome_counts(items)
+    counts = classification_counts(payload, items)
+    signals = aggregate_signals(items)
+    unreadable_count = sum(1 for item in items if is_unreadable(item))
+    ok_count = sum(1 for item in items if normalized_extraction_status(item) == "ok")
+    partial_count = sum(1 for item in items if is_partially_usable(item))
+    insufficient_text_count = sum(1 for item in items if has_insufficient_text(item))
+    non_accusation_count = len([item for item in payload.get("non_accusation_set") or [] if isinstance(item, dict)])
     return {
-        "generated_at": payload.get("generated_at") or "unknown",
-        "input_path": payload.get("input_path") or "unknown",
-        "mode": payload.get("mode") or "unknown",
-        "audit_basis": payload.get("audit_basis") or "unknown",
-        "classification_counts": payload.get("classification_counts") or {},
-        "route_counts": payload.get("route_counts") or {},
-        "stats": stats,
-        "findings": findings,
-        "evidence": evidence,
-        "limits": limits,
-        "executive_summary": (
-            "This report translates a legacy TCRIA audit payload into a reader-oriented summary. "
-            f"The most visible issue in the reviewed batch is: {top_issue}"
-        ),
+        "generated_at": normalized_text(payload.get("generated_at")),
+        "audit_basis": normalized_text(payload.get("audit_basis")),
+        "mode": normalized_text(payload.get("mode") or payload.get("compliance_gate_mode")),
+        "total_files_scanned": int(payload.get("total_files_scanned") or len(items)),
+        "accusation_set_count": int(payload.get("accusation_set_count") or len(payload.get("accusation_set") or [])),
+        "non_accusation_set_count": non_accusation_count,
+        "classification_counts": counts,
+        "document_outcomes": outcomes,
+        "gate_counts": gate_counts,
+        "signals": signals,
+        "coverage": {
+            "ok_count": ok_count,
+            "unreadable_count": unreadable_count,
+            "partial_count": partial_count,
+            "insufficient_text_count": insufficient_text_count,
+        },
+        "documents": [
+            {
+                "file_name": file_name(item),
+                "classification": normalized_classification(item),
+                "extraction_status": normalized_extraction_status(item),
+                "text_quality": normalized_text_quality(item),
+                "overall_outcome": normalized_outcome(item),
+                "gate_summary": summarize_gates(item),
+            }
+            for item in items
+        ],
     }
 
 
-def render_markdown(summary: dict[str, Any]) -> str:
-    stats = summary["stats"]
+def render_markdown(report: dict[str, Any]) -> str:
+    docs = report["documents"]
+    counts = report["classification_counts"]
+    outcomes = report["document_outcomes"]
+    gate_counts = report["gate_counts"]
+    coverage = report["coverage"]
+    signals = report["signals"]
+
     lines: list[str] = []
-    lines.append("# Legacy Audit Summary")
+    lines.append("# Resumo de Cobertura da Auditoria Legada")
     lines.append("")
-    lines.append("## Executive Summary")
+    lines.append("## 1. Visão geral do lote")
+    lines.append(f"- Total de arquivos escaneados: `{report['total_files_scanned']}`")
+    lines.append(f"- Modo de auditoria: `{report['mode']}`")
+    lines.append(f"- Data de geração: `{report['generated_at']}`")
+    lines.append(f"- Base técnica registrada: `{report['audit_basis']}`")
     lines.append("")
-    lines.append(summary["executive_summary"])
+    lines.append("## 2. Cobertura da leitura")
+    lines.append(f"- Arquivos com `extraction_status = ok`: `{coverage['ok_count']}`")
+    lines.append(f"- Arquivos `unreadable` ou `unreadable_or_empty`: `{coverage['unreadable_count']}`")
+    lines.append(f"- Arquivos parcialmente aproveitáveis: `{coverage['partial_count']}`")
+    lines.append(f"- Arquivos sem texto suficiente: `{coverage['insufficient_text_count']}`")
     lines.append("")
-    lines.append("## Batch Snapshot")
+    lines.append("## 3. Classificações")
+    lines.append("| Classificação | Quantidade |")
+    lines.append("| --- | ---: |")
+    for classification, quantity in sorted(counts.items(), key=lambda item: (-item[1], item[0])):
+        lines.append(f"| `{classification}` | `{quantity}` |")
+    lines.append(f"- `accusation_set_count`: `{report['accusation_set_count']}`")
+    if report["non_accusation_set_count"] > 0:
+        lines.append(f"- `non_accusation_set`: `{report['non_accusation_set_count']}` documento(s)")
     lines.append("")
-    lines.append(f"- Generated at: `{summary['generated_at']}`")
-    lines.append(f"- Legacy mode: `{summary['mode']}`")
-    lines.append(f"- Total files scanned: `{stats['total_files']}`")
-    lines.append(f"- Files read: `{stats['files_read']}`")
-    lines.append(f"- Files not read: `{stats['files_unread']}`")
-    lines.append(f"- Files blocked: `{stats['files_blocked']}`")
-    lines.append(f"- Files partially read: `{stats['files_partially_read']}`")
+    lines.append("## 4. Outcomes")
+    lines.append(f"- `PARTIAL_PASS`: `{outcomes['PARTIAL_PASS']}`")
+    lines.append(f"- `BLOCKED`: `{outcomes['BLOCKED']}`")
+    lines.append(f"- `PASS`: `{outcomes['PASS']}`")
+    lines.append(f"- Gates com `WARN`: `{gate_counts['WARN']}`")
+    lines.append(f"- Gates com `NOT_EVALUATED`: `{gate_counts['NOT_EVALUATED']}`")
     lines.append("")
-    lines.append("## Main Findings")
+    lines.append("## 5. Mapa de documentos")
+    lines.append("| Documento | Classificação | Extraction status | Text quality | Overall outcome | Gates principais |")
+    lines.append("| --- | --- | --- | --- | --- | --- |")
+    for doc in docs:
+        lines.append(
+            "| `{file_name}` | `{classification}` | `{extraction_status}` | `{text_quality}` | `{overall_outcome}` | {gate_summary} |".format(
+                **doc
+            )
+        )
     lines.append("")
-    for idx, finding in enumerate(summary["findings"], start=1):
-        lines.append(f"### Finding {idx}: {finding['title']}")
-        lines.append("")
-        lines.append(f"- Legacy status: `{finding['status']}`")
-        lines.append("")
-        lines.append(finding["summary"])
-        lines.append("")
-        if finding["reasons"]:
-            lines.append("Reasons carried from the legacy payload:")
-            lines.append("")
-            for reason in finding["reasons"]:
-                lines.append(f"- {reason}")
-            lines.append("")
-    lines.append("## Evidence Highlights")
+    lines.append("## 6. Principais sinais encontrados")
+    lines.append(f"- Datas: {format_list(signals['dates_found'], 'nenhuma data agregada')}")
+    lines.append(f"- Valores monetários: {format_list(signals['currency_values_found'], 'nenhum valor monetário agregado')}")
+    lines.append(
+        f"- Menções a Pix: `{signals['pix_mentions_total']}` ocorrência(s) em `{signals['pix_documents']}` documento(s)"
+    )
+    lines.append(f"- Marcadores de evidência: {format_counter(signals['evidence_markers'])}")
+    lines.append(f"- Termos de acusação: {format_counter(signals['accusation_terms'])}")
     lines.append("")
-    for idx, item in enumerate(summary["evidence"], start=1):
-        lines.append(f"### Evidence {idx}: {item['title']}")
-        lines.append("")
-        lines.append(f"- Classification: `{item['classification']}`")
-        lines.append(f"- Signal summary: `{item['detail']}`")
-        lines.append("")
-        lines.append(item["summary"])
-        lines.append("")
-    lines.append("## Limits And Translation Notes")
+    lines.append("## 7. Limitações")
+    lines.append("- `BLOCKED` não significa descarte; significa que o lote pede revisão técnica ou complemento antes de um juízo mais forte.")
+    lines.append("- `NOT_EVALUATED` não significa falha; significa que aquele gate não pôde ser concluído com o material disponível.")
+    lines.append("- `WARN` significa leitura com ressalva; o documento ainda pode carregar sinal útil para compliance e rastreabilidade.")
+    lines.append("- Documento sem `DecisionRecord` pode continuar útil em perfil exploratório ou empresarial, mesmo fora do modo estrito.")
     lines.append("")
-    for item in summary["limits"]:
-        lines.append(f"- {item}")
-    lines.append("")
-    lines.append("## Legacy Counters")
-    lines.append("")
-    lines.append(f"- Classification counts: `{summary['classification_counts']}`")
-    lines.append(f"- Route counts: `{summary['route_counts']}`")
+    lines.append("## 8. Observação final")
+    lines.append(
+        "Este resumo é uma ponte de migração do legado. Ele organiza cobertura de leitura, classificação e sinais técnicos, "
+        "mas não substitui o relatório executivo principal do produto."
+    )
     lines.append("")
     return "\n".join(lines)
 
 
-def build_styles():
-    styles = getSampleStyleSheet()
-    styles.add(
-        ParagraphStyle(
-            name="ReportTitle",
-            parent=styles["Title"],
-            fontName="Helvetica-Bold",
-            fontSize=19,
-            leading=23,
-            textColor=colors.HexColor("#0f172a"),
-            spaceAfter=8,
-        )
-    )
-    styles.add(
-        ParagraphStyle(
-            name="SectionHeading",
-            parent=styles["Heading2"],
-            fontName="Helvetica-Bold",
-            fontSize=13,
-            leading=16,
-            textColor=colors.HexColor("#0f172a"),
-            spaceBefore=8,
-            spaceAfter=6,
-        )
-    )
-    styles.add(
-        ParagraphStyle(
-            name="SubHeading",
-            parent=styles["Heading3"],
-            fontName="Helvetica-Bold",
-            fontSize=10,
-            leading=13,
-            textColor=colors.HexColor("#1f2937"),
-            spaceBefore=4,
-            spaceAfter=3,
-        )
-    )
-    styles.add(
-        ParagraphStyle(
-            name="Body",
-            parent=styles["BodyText"],
-            fontName="Helvetica",
-            fontSize=9.2,
-            leading=13,
-            textColor=colors.HexColor("#111827"),
-        )
-    )
-    return styles
-
-
-def label_table(rows: list[list[str]], col_widths: list[float]) -> Table:
-    table = Table(rows, colWidths=col_widths)
-    table.setStyle(
-        TableStyle(
-            [
-                ("BACKGROUND", (0, 0), (0, -1), colors.HexColor("#eff6ff")),
-                ("TEXTCOLOR", (0, 0), (-1, -1), colors.HexColor("#0f172a")),
-                ("FONTNAME", (0, 0), (0, -1), "Helvetica-Bold"),
-                ("FONTNAME", (1, 0), (-1, -1), "Helvetica"),
-                ("FONTSIZE", (0, 0), (-1, -1), 8.5),
-                ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#dbeafe")),
-                ("VALIGN", (0, 0), (-1, -1), "TOP"),
-                ("LEFTPADDING", (0, 0), (-1, -1), 5),
-                ("RIGHTPADDING", (0, 0), (-1, -1), 5),
-                ("TOPPADDING", (0, 0), (-1, -1), 4),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
-            ]
-        )
-    )
-    return table
-
-
-def metric_table(summary: dict[str, Any]) -> Table:
-    stats = summary["stats"]
-    rows = [
-        ["Metric", "Value"],
-        ["Total files scanned", str(stats["total_files"])],
-        ["Files read", str(stats["files_read"])],
-        ["Files not read", str(stats["files_unread"])],
-        ["Files blocked", str(stats["files_blocked"])],
-        ["Files partially read", str(stats["files_partially_read"])],
-    ]
-    table = Table(rows, colWidths=[58 * mm, 42 * mm], repeatRows=1)
-    table.setStyle(
-        TableStyle(
-            [
-                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#0f172a")),
-                ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-                ("FONTNAME", (0, 1), (-1, -1), "Helvetica"),
-                ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#f8fafc")]),
-                ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#cbd5e1")),
-                ("FONTSIZE", (0, 0), (-1, -1), 8.5),
-                ("VALIGN", (0, 0), (-1, -1), "TOP"),
-                ("LEFTPADDING", (0, 0), (-1, -1), 5),
-                ("RIGHTPADDING", (0, 0), (-1, -1), 5),
-                ("TOPPADDING", (0, 0), (-1, -1), 4),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
-            ]
-        )
-    )
-    return table
-
-
-def bullet_paragraphs(items: list[str], style: ParagraphStyle) -> list[Paragraph]:
-    return [Paragraph(f"- {safe(item)}", style) for item in items]
-
-
-def add_page_chrome(canvas_obj, doc):
-    canvas_obj.saveState()
-    canvas_obj.setStrokeColor(colors.HexColor("#cbd5e1"))
-    canvas_obj.setLineWidth(0.4)
-    canvas_obj.line(doc.leftMargin, doc.pagesize[1] - 20 * mm, doc.pagesize[0] - doc.rightMargin, doc.pagesize[1] - 20 * mm)
-    canvas_obj.line(doc.leftMargin, 14 * mm, doc.pagesize[0] - doc.rightMargin, 14 * mm)
-    canvas_obj.setFont("Helvetica-Bold", 8)
-    canvas_obj.setFillColor(colors.HexColor("#0f172a"))
-    canvas_obj.drawString(doc.leftMargin, doc.pagesize[1] - 14 * mm, "TCRIA Legacy Audit Adapter")
-    canvas_obj.setFont("Helvetica", 8)
-    canvas_obj.setFillColor(colors.HexColor("#475569"))
-    canvas_obj.drawString(doc.leftMargin, 8 * mm, "Adapted legacy output")
-    canvas_obj.drawRightString(doc.pagesize[0] - doc.rightMargin, 8 * mm, f"Page {canvas_obj.getPageNumber()}")
-    canvas_obj.restoreState()
-
-
-def render_pdf(summary: dict[str, Any], pdf_path: Path) -> None:
-    pdf_path.parent.mkdir(parents=True, exist_ok=True)
-    styles = build_styles()
-    doc = SimpleDocTemplate(
-        str(pdf_path),
-        pagesize=A4,
-        leftMargin=16 * mm,
-        rightMargin=16 * mm,
-        topMargin=24 * mm,
-        bottomMargin=18 * mm,
-        title="Legacy Audit Summary",
-        author="OpenAI Codex",
-    )
-
-    story = [
-        Paragraph("Legacy Audit Summary", styles["ReportTitle"]),
-        Paragraph(safe(summary["executive_summary"]), styles["Body"]),
-        Spacer(1, 8),
-        label_table(
-            [
-                ["Generated at", str(summary["generated_at"])],
-                ["Legacy mode", str(summary["mode"])],
-                ["Legacy basis", str(summary["audit_basis"])],
-                ["Input path", str(summary["input_path"])],
-            ],
-            [36 * mm, 132 * mm],
-        ),
-        Spacer(1, 8),
-        Paragraph("Batch snapshot", styles["SectionHeading"]),
-        metric_table(summary),
-        Spacer(1, 8),
-        Paragraph("Main findings", styles["SectionHeading"]),
-    ]
-
-    for finding in summary["findings"]:
-        story.append(
-            KeepTogether(
-                [
-                    Paragraph(safe(finding["title"]), styles["SubHeading"]),
-                    Paragraph(f"<b>Legacy status:</b> {safe(finding['status'])}", styles["Body"]),
-                    Paragraph(safe(finding["summary"]), styles["Body"]),
-                    *bullet_paragraphs(finding["reasons"], styles["Body"]),
-                    Spacer(1, 4),
-                ]
-            )
-        )
-
-    story.extend([Paragraph("Evidence highlights", styles["SectionHeading"])])
-    for item in summary["evidence"]:
-        story.append(
-            KeepTogether(
-                [
-                    Paragraph(safe(item["title"]), styles["SubHeading"]),
-                    Paragraph(f"<b>Classification:</b> {safe(item['classification'])}", styles["Body"]),
-                    Paragraph(f"<b>Signal summary:</b> {safe(item['detail'])}", styles["Body"]),
-                    Paragraph(safe(item["summary"]), styles["Body"]),
-                    Spacer(1, 4),
-                ]
-            )
-        )
-
-    story.extend(
-        [
-            Paragraph("Limits and translation notes", styles["SectionHeading"]),
-            *bullet_paragraphs(summary["limits"], styles["Body"]),
-            Spacer(1, 6),
-            Paragraph("Legacy counters", styles["SectionHeading"]),
-            Paragraph(f"<b>Classification counts:</b> {safe(summary['classification_counts'])}", styles["Body"]),
-            Paragraph(f"<b>Route counts:</b> {safe(summary['route_counts'])}", styles["Body"]),
-        ]
-    )
-
-    doc.build(story, onFirstPage=add_page_chrome, onLaterPages=add_page_chrome)
-
-
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Render a legacy TCRIA audit payload into Markdown and PDF.")
-    parser.add_argument("--input", type=Path, default=DEFAULT_INPUT, help="Path to the legacy JSON payload.")
-    parser.add_argument("--md-output", type=Path, default=DEFAULT_MD, help="Path for the generated Markdown report.")
-    parser.add_argument("--pdf-output", type=Path, default=DEFAULT_PDF, help="Path for the generated PDF report.")
+    parser = argparse.ArgumentParser(
+        description="Render a sanitized legacy TCRIA audit payload into a human-readable Markdown coverage summary."
+    )
+    parser.add_argument("--input", type=Path, default=DEFAULT_INPUT, help="Path to the sanitized legacy JSON payload.")
+    parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT, help="Path for the generated Markdown report.")
     args = parser.parse_args()
 
     payload = load_payload(args.input.expanduser().resolve())
-    summary = build_summary(payload)
+    report = build_report(payload)
 
-    args.md_output.parent.mkdir(parents=True, exist_ok=True)
-    args.md_output.write_text(render_markdown(summary), encoding="utf-8")
-    render_pdf(summary, args.pdf_output.expanduser().resolve())
-
-    print(args.md_output.expanduser().resolve())
-    print(args.pdf_output.expanduser().resolve())
+    output_path = args.output.expanduser().resolve()
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(render_markdown(report), encoding="utf-8")
+    print(output_path)
 
 
 if __name__ == "__main__":

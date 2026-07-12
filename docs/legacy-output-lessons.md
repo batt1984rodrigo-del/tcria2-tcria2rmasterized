@@ -11,6 +11,7 @@ It exists to preserve what the old system did well while making explicit what ne
 - exposed gate results and outcome states;
 - retained traceability-rich technical detail;
 - separated accusation-oriented and non-accusation-oriented material.
+- captured useful compliance-facing signals even when the final reading experience was weak.
 
 The legacy system was not empty or weak.
 
@@ -45,7 +46,19 @@ The old output captured many useful signals:
 
 But those signals were not consistently translated into a client-facing explanation.
 
-### 4. The system organized, but did not sufficiently show that it organized
+### 4. Compliance coverage was present, but not clearly framed
+
+The product direction is compliance-oriented.
+
+That means the first reader question is usually not "what did the engine run?"
+
+It is:
+
+"How much of the batch was actually usable, what was blocked, and where are the gaps?"
+
+The legacy output often had the raw ingredients for that answer, but not the formatted response itself.
+
+### 5. The system organized, but did not sufficiently show that it organized
 
 This is the central lesson.
 
@@ -63,6 +76,7 @@ The engine often knew more than the reader could quickly perceive from the repor
 ## What Must Change
 
 - the primary output must become reader-first;
+- the primary output must become compliance-coverage-first;
 - the first page must explain the batch condition quickly;
 - technical details must move into annexes or supporting sections;
 - the legacy result must be normalized before presentation;
@@ -72,7 +86,7 @@ The engine often knew more than the reader could quickly perceive from the repor
 
 The remodeled repository should treat legacy output as:
 
-`legacy JSON -> normalizer -> client-facing report`
+`legacy JSON -> normalizer -> human coverage report`
 
 It should not treat legacy output as:
 
@@ -86,6 +100,7 @@ The legacy adapter is the safest entry path because it:
 - avoids dumping legacy code into the new repository structure;
 - solves the most visible product defect first;
 - creates immediate value through improved presentation.
+- gives the compliance product a clear migration bridge without pretending to replace the final executive report.
 
 ## Repository Guidance
 

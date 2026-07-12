@@ -6,7 +6,7 @@ Reference artifacts:
 
 - legacy sample input: [../examples/legacy/sanitized-strict-audit.json](../examples/legacy/sanitized-strict-audit.json)
 - adapted Markdown example: [../output/legacy/legacy-audit-summary.md](../output/legacy/legacy-audit-summary.md)
-- adapted PDF example: [../output/pdf/legacy-audit-summary.pdf](../output/pdf/legacy-audit-summary.pdf)
+- coverage and provenance notes: [./coverage-and-provenance.md](./coverage-and-provenance.md)
 
 ## Core Rule
 
@@ -14,7 +14,7 @@ Legacy output enters through translation.
 
 The official path is:
 
-`legacy JSON -> normalizer -> structured Markdown -> client-facing PDF`
+`legacy JSON -> normalizer -> structured Markdown`
 
 The repository should not import the old engine wholesale as the first integration step.
 
@@ -26,14 +26,14 @@ Its responsibility is to:
 
 - read a legacy audit JSON payload;
 - extract the operational and review-relevant information;
-- reorganize it into a human-readable summary;
-- render that summary into Markdown and PDF.
+- reorganize it into a human-readable coverage summary;
+- keep the result objective and suitable for compliance-oriented reading.
 
 ## Input Contract
 
 The adapter accepts a legacy audit payload shaped like the older TCRIA outputs.
 
-Expected top-level fields include:
+Expected top-level fields for the sanitized batch sample include:
 
 - `generated_at`
 - `audit_basis`
@@ -75,27 +75,27 @@ The adapter should degrade gracefully when some fields are missing.
 The normalizer should produce a simpler summary model with concepts such as:
 
 - files read;
-- files not read;
-- blocked files;
-- partially read or weak-quality files;
-- main findings;
-- evidence highlights;
-- unresolved limits;
-- translation notes.
+- files unreadable or empty;
+- partially usable files;
+- files with insufficient text;
+- classification totals;
+- document outcomes;
+- gate warnings and not-evaluated states;
+- document-level coverage map;
+- aggregated technical signals.
 
 ## Main Output Contract
 
 The adapter must generate:
 
-1. a human-readable Markdown report;
-2. a client-facing PDF version of that report.
+1. a human-readable Markdown report.
 
 The adapted report should:
 
 - explain the legacy batch in plain language;
-- prioritize what matters first;
-- separate findings from supporting evidence;
-- preserve uncertainty and limitations.
+- make coverage visible before interpretation;
+- preserve uncertainty and limitations;
+- act as a migration bridge, not as the final executive report.
 
 ## Non-Goals
 
@@ -110,7 +110,7 @@ The adapter should not:
 
 The original legacy JSON remains a technical source artifact.
 
-The adapted Markdown and PDF become the reader-oriented outputs.
+The adapted Markdown becomes the reader-oriented migration output for this phase.
 
 That means:
 

@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-04-23T11:25:36",
-  "audit_basis": "TCRIA modular engine audit (prescriptiveGate, complianceGate, traceabilityCheck)",
-  "input_path": "/sanitized/acme-corp/procurement-batch-q2",
+  "generated_at": "2026-07-11T16:40:00",
+  "audit_basis": "TCRIA legacy compliance coverage audit (sanitized example)",
+  "input_path": "/sanitized/example-corp/ops-compliance-batch-a",
   "mode": "strict-explicit-decision-record",
   "compliance_gate_mode": "strict-explicit-decision-record",
   "total_files_scanned": 4,
@@ -12,90 +12,115 @@
     "UNREADABLE": 1
   },
   "route_counts": {
-    "CIVIL_CRIMINAL_INVESTIGATIVE": 2,
+    "COMPLIANCE_EXCEPTION_REVIEW": 2,
     "EVIDENTIARY_SUPPORT_GENERAL": 1,
     "UNDETERMINED": 1
   },
   "document_role_counts": {
     "SUPPORTING_PROOF": 2,
-    "UNDETERMINED": 1,
-    "PROCEDURAL_REQUEST": 1
+    "PROCEDURAL_REQUEST": 1,
+    "UNDETERMINED": 1
   },
   "accusation_set": [
     {
-      "file_name": "contract-amendment-17.pdf",
-      "file_path": "/sanitized/acme-corp/procurement-batch-q2/contract-amendment-17.pdf",
+      "file_name": "contract-adjustment-alpha.pdf",
+      "file_path": "/sanitized/example-corp/ops-compliance-batch-a/contract-adjustment-alpha.pdf",
       "classification": "ACCUSATORY_CANDIDATE",
-      "summary": "High-value amendment found without strong approval support in the reviewed batch.",
+      "summary": "High-value procurement adjustment found without explicit decision record in the submitted batch.",
       "overall_outcome": "BLOCKED (complianceGate)",
       "classification_reasons": [
-        "Missing approval support",
-        "High-value contract change",
-        "Traceability expectation not fully satisfied"
+        "Decision record not found in strict mode",
+        "High-value approval trail incomplete",
+        "Traceability support remains limited"
       ],
       "text_quality": "medium",
       "extraction_status": "ok",
+      "extractable_text_chars": 842,
       "gates": {
         "prescriptiveGate": {
           "status": "PASS",
-          "reason": "No prescriptive patterns detected."
+          "reason": "No prescriptive wording issue found."
         },
         "complianceGate": {
           "status": "BLOCKED",
-          "reason": "DecisionRecord header not found in strict mode."
+          "reason": "Strict decision record requirement not satisfied."
         },
         "traceabilityCheck": {
           "status": "WARN",
-          "reason": "Limited traceability signals found."
+          "reason": "Support chain is present but incomplete."
         }
       },
       "key_signals": {
-        "evidence_marker_hits": {},
-        "target_entity_hits": {
-          "acme corp": 2
+        "dates_found": [
+          "2026-06-03",
+          "2026-06-18"
+        ],
+        "currency_values_found": [
+          "R$ 148.000,00"
+        ],
+        "pix_mentions": 0,
+        "evidence_marker_hits": {
+          "approval note": 1,
+          "purchase order": 1
+        },
+        "accusation_keyword_hits": {
+          "approval gap": 2,
+          "exception request": 1
         }
       }
     },
     {
-      "file_name": "vendor-boarding-form.pdf",
-      "file_path": "/sanitized/acme-corp/procurement-batch-q2/vendor-boarding-form.pdf",
+      "file_name": "supplier-review-note-beta.pdf",
+      "file_path": "/sanitized/example-corp/ops-compliance-batch-a/supplier-review-note-beta.pdf",
       "classification": "ACCUSATORY_CANDIDATE",
-      "summary": "Vendor file contains a declared review record but only partial due diligence support.",
+      "summary": "Supplier review note carries a formal review entry, but due diligence support is only partial.",
       "overall_outcome": "PARTIAL_PASS (traceability warning; static audit)",
       "classification_reasons": [
-        "Supporting approval record present",
-        "Due diligence evidence incomplete",
-        "Traceability signals limited"
+        "Decision record header detected",
+        "Due diligence support is incomplete",
+        "Traceability signals need reinforcement"
       ],
       "text_quality": "medium",
       "extraction_status": "ok",
+      "extractable_text_chars": 526,
       "gates": {
         "prescriptiveGate": {
           "status": "PASS",
-          "reason": "No prescriptive patterns detected."
+          "reason": "No prescriptive wording issue found."
         },
         "complianceGate": {
           "status": "PASS",
-          "reason": "DecisionRecord requirements satisfied."
+          "reason": "Strict decision record requirement satisfied."
         },
         "traceabilityCheck": {
           "status": "WARN",
-          "reason": "Limited traceability signals found."
+          "reason": "Coverage is usable but still partial."
         }
       },
       "key_signals": {
+        "dates_found": [
+          "2026-06-21"
+        ],
+        "currency_values_found": [],
+        "pix_mentions": [
+          "pix workflow mention"
+        ],
         "evidence_marker_hits": {
-          "checklist": 1
+          "checklist": 1,
+          "decisionrecord": 1
+        },
+        "accusation_keyword_hits": {
+          "incomplete verification": 1
         }
       }
     }
   ],
   "non_accusation_set": [
     {
-      "file_name": "vendor-checklist-register.csv",
-      "file_path": "/sanitized/acme-corp/procurement-batch-q2/vendor-checklist-register.csv",
+      "file_name": "control-checklist-gamma.csv",
+      "file_path": "/sanitized/example-corp/ops-compliance-batch-a/control-checklist-gamma.csv",
       "classification": "SUPPORTING_EVIDENCE_RELEVANT",
-      "summary": "Register contains evidence of required checklist controls for multiple suppliers.",
+      "summary": "Control register preserves supporting proof for routine vendor checks and approval checkpoints.",
       "overall_outcome": "PASS",
       "classification_reasons": [
         "Supporting evidence markers identified",
@@ -103,29 +128,56 @@
       ],
       "text_quality": "high",
       "extraction_status": "ok",
+      "extractable_text_chars": 1580,
       "gates": null,
       "key_signals": {
+        "dates_found": [
+          "2026-06-02",
+          "2026-06-27"
+        ],
+        "currency_values_found": [
+          "R$ 12.500,00"
+        ],
+        "pix_mentions": {
+          "mentions": 2
+        },
         "evidence_marker_hits": {
+          "approval id": 4,
           "checklist": 5,
-          "supplier id": 8
-        }
+          "evidence ref": 3
+        },
+        "accusation_keyword_hits": {}
       }
     },
     {
-      "file_name": "scanned-exception-request.pdf",
-      "file_path": "/sanitized/acme-corp/procurement-batch-q2/scanned-exception-request.pdf",
+      "file_name": "unreadable-scan-delta.pdf",
+      "file_path": "/sanitized/example-corp/ops-compliance-batch-a/unreadable-scan-delta.pdf",
       "classification": "UNREADABLE",
-      "summary": "The file could not be read reliably from the submitted batch.",
-      "overall_outcome": null,
+      "summary": "The scan is present in the batch, but text extraction did not produce enough readable material for gate completion.",
+      "overall_outcome": "NOT_EVALUATED",
       "classification_reasons": [
         "Unreadable scan",
         "Insufficient extraction quality"
       ],
       "text_quality": "low",
-      "extraction_status": "error",
-      "gates": null,
+      "extraction_status": "unreadable_or_empty",
+      "extractable_text_chars": 0,
+      "gates": {
+        "prescriptiveGate": {
+          "status": "NOT_EVALUATED",
+          "reason": "No stable text body available."
+        },
+        "complianceGate": {
+          "status": "NOT_EVALUATED",
+          "reason": "No stable text body available."
+        }
+      },
       "key_signals": {
-        "evidence_marker_hits": {}
+        "dates_found": [],
+        "currency_values_found": [],
+        "pix_mentions": 0,
+        "evidence_marker_hits": {},
+        "accusation_keyword_hits": {}
       }
     }
   ]

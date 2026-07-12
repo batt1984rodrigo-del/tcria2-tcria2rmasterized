@@ -1,91 +1,53 @@
-# Legacy Audit Summary
+# Resumo de Cobertura da Auditoria Legada
 
-## Executive Summary
+## 1. Visão geral do lote
+- Total de arquivos escaneados: `4`
+- Modo de auditoria: `strict-explicit-decision-record`
+- Data de geração: `2026-07-11T16:40:00`
+- Base técnica registrada: `TCRIA legacy compliance coverage audit (sanitized example)`
 
-This report translates a legacy TCRIA audit payload into a reader-oriented summary. The most visible issue in the reviewed batch is: High-value amendment found without strong approval support in the reviewed batch.
+## 2. Cobertura da leitura
+- Arquivos com `extraction_status = ok`: `3`
+- Arquivos `unreadable` ou `unreadable_or_empty`: `1`
+- Arquivos parcialmente aproveitáveis: `2`
+- Arquivos sem texto suficiente: `1`
 
-## Batch Snapshot
+## 3. Classificações
+| Classificação | Quantidade |
+| --- | ---: |
+| `ACCUSATORY_CANDIDATE` | `2` |
+| `SUPPORTING_EVIDENCE_RELEVANT` | `1` |
+| `UNREADABLE` | `1` |
+- `accusation_set_count`: `2`
+- `non_accusation_set`: `2` documento(s)
 
-- Generated at: `2026-04-23T11:25:36`
-- Legacy mode: `strict-explicit-decision-record`
-- Total files scanned: `4`
-- Files read: `3`
-- Files not read: `1`
-- Files blocked: `1`
-- Files partially read: `2`
+## 4. Outcomes
+- `PARTIAL_PASS`: `1`
+- `BLOCKED`: `1`
+- `PASS`: `1`
+- Gates com `WARN`: `2`
+- Gates com `NOT_EVALUATED`: `2`
 
-## Main Findings
+## 5. Mapa de documentos
+| Documento | Classificação | Extraction status | Text quality | Overall outcome | Gates principais |
+| --- | --- | --- | --- | --- | --- |
+| `contract-adjustment-alpha.pdf` | `ACCUSATORY_CANDIDATE` | `ok` | `medium` | `BLOCKED (complianceGate)` | complianceGate=BLOCKED; prescriptiveGate=PASS; traceabilityCheck=WARN |
+| `supplier-review-note-beta.pdf` | `ACCUSATORY_CANDIDATE` | `ok` | `medium` | `PARTIAL_PASS (traceability warning; static audit)` | complianceGate=PASS; prescriptiveGate=PASS; traceabilityCheck=WARN |
+| `control-checklist-gamma.csv` | `SUPPORTING_EVIDENCE_RELEVANT` | `ok` | `high` | `PASS` | not exposed in legacy item |
+| `unreadable-scan-delta.pdf` | `UNREADABLE` | `unreadable_or_empty` | `low` | `NOT_EVALUATED` | complianceGate=NOT_EVALUATED; prescriptiveGate=NOT_EVALUATED |
 
-### Finding 1: contract-amendment-17.pdf
+## 6. Principais sinais encontrados
+- Datas: 2026-06-02, 2026-06-03, 2026-06-18, 2026-06-21, 2026-06-27
+- Valores monetários: R$ 148.000,00, R$ 12.500,00
+- Menções a Pix: `3` ocorrência(s) em `2` documento(s)
+- Marcadores de evidência: checklist=6, approval id=4, evidence ref=3, approval note=1, decisionrecord=1, purchase order=1
+- Termos de acusação: approval gap=2, exception request=1, incomplete verification=1
 
-- Legacy status: `BLOCKED (complianceGate)`
+## 7. Limitações
+- `BLOCKED` não significa descarte; significa que o lote pede revisão técnica ou complemento antes de um juízo mais forte.
+- `NOT_EVALUATED` não significa falha; significa que aquele gate não pôde ser concluído com o material disponível.
+- `WARN` significa leitura com ressalva; o documento ainda pode carregar sinal útil para compliance e rastreabilidade.
+- Documento sem `DecisionRecord` pode continuar útil em perfil exploratório ou empresarial, mesmo fora do modo estrito.
 
-High-value amendment found without strong approval support in the reviewed batch.
-
-Reasons carried from the legacy payload:
-
-- Missing approval support
-- High-value contract change
-- Traceability expectation not fully satisfied
-
-### Finding 2: vendor-boarding-form.pdf
-
-- Legacy status: `PARTIAL_PASS (traceability warning; static audit)`
-
-Vendor file contains a declared review record but only partial due diligence support.
-
-Reasons carried from the legacy payload:
-
-- Supporting approval record present
-- Due diligence evidence incomplete
-- Traceability signals limited
-
-### Finding 3: scanned-exception-request.pdf
-
-- Legacy status: `UNREADABLE`
-
-The file could not be read reliably from the submitted batch.
-
-Reasons carried from the legacy payload:
-
-- Unreadable scan
-- Insufficient extraction quality
-
-### Finding 4: vendor-checklist-register.csv
-
-- Legacy status: `PASS`
-
-Register contains evidence of required checklist controls for multiple suppliers.
-
-Reasons carried from the legacy payload:
-
-- Supporting evidence markers identified
-- Document role suggests supporting proof
-
-## Evidence Highlights
-
-### Evidence 1: vendor-boarding-form.pdf
-
-- Classification: `ACCUSATORY_CANDIDATE`
-- Signal summary: `checklist=1`
-
-Vendor file contains a declared review record but only partial due diligence support.
-
-### Evidence 2: vendor-checklist-register.csv
-
-- Classification: `SUPPORTING_EVIDENCE_RELEVANT`
-- Signal summary: `checklist=5, supplier id=8`
-
-Register contains evidence of required checklist controls for multiple suppliers.
-
-## Limits And Translation Notes
-
-- 1 file(s) could not be read reliably from the legacy batch.
-- 2 file(s) were read with only low or medium extraction quality.
-- Some legacy items do not expose gate details in a consistent way.
-- This adapted report summarizes a legacy payload and does not re-run the original engine.
-
-## Legacy Counters
-
-- Classification counts: `{'ACCUSATORY_CANDIDATE': 2, 'SUPPORTING_EVIDENCE_RELEVANT': 1, 'UNREADABLE': 1}`
-- Route counts: `{'CIVIL_CRIMINAL_INVESTIGATIVE': 2, 'EVIDENTIARY_SUPPORT_GENERAL': 1, 'UNDETERMINED': 1}`
+## 8. Observação final
+Este resumo é uma ponte de migração do legado. Ele organiza cobertura de leitura, classificação e sinais técnicos, mas não substitui o relatório executivo principal do produto.
