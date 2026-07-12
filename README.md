@@ -1,5 +1,7 @@
 # TCRIA
 
+Compliance review for company document batches with structured, client-facing reports.
+
 TCRIA is a document batch compliance review system.
 
 Its current task is simple and specific: receive a bounded batch of company documents and return a structured compliance review report with findings, evidence references, limits, and next review priorities.
