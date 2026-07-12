@@ -70,6 +70,7 @@ The current repository foundation assumes:
 - [Product Definition](docs/product-vision.md)
 - [Analysis Model](docs/analysis-model.md)
 - [Governance Profiles](docs/governance-profiles.md)
+- [Integration Readiness](docs/integration-readiness.md)
 - [Output Specification](docs/output-philosophy.md)
 - [Output Taxonomy](docs/output-taxonomy.md)
 - [Report Contract](docs/report-contract.md)
