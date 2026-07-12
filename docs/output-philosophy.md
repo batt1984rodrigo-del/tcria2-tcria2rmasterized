@@ -15,6 +15,7 @@ The structured compliance review report should contain, at minimum:
 
 - formatted client-facing presentation;
 - analysis scope;
+- reading coverage and extraction provenance;
 - applied review rules or policy;
 - compliance findings summary;
 - evidence references;
@@ -33,6 +34,7 @@ Every substantial output should answer:
 5. What could not be determined?
 6. What should be reviewed next?
 7. Where are the main conformity gaps?
+8. How was the text obtained: direct extraction, OCR fallback, or failed OCR?
 
 If these questions are not answered, the output is incomplete.
 
@@ -50,6 +52,7 @@ It should be formatted so that the main compliance situation is understandable f
 - analysis scope;
 - applied rules or policy;
 - key findings and classifications;
+- reading coverage and method provenance;
 - supporting evidence;
 - limitations;
 - recommended next steps;
@@ -63,6 +66,8 @@ That layer should:
 
 - arrange findings consistently;
 - attach evidence references;
+- expose which reading method was used for relevant documents;
+- expose OCR fallback and OCR failure when they happened;
 - state the applied rules;
 - apply report structure and visual hierarchy;
 - expose uncertainty or missing data;

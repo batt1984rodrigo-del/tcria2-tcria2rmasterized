@@ -14,7 +14,10 @@ Responsibilities include:
 
 - file discovery or upload intake;
 - format normalization;
-- text extraction;
+- direct text extraction;
+- OCR fallback for PDFs when direct extraction is insufficient;
+- reading-method provenance capture;
+- reading confidence capture when available;
 - metadata capture;
 - preprocessing for downstream analysis.
 

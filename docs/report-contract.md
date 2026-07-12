@@ -17,6 +17,7 @@ The client-facing report must be understandable on first reading.
 When a client opens the document, the structure should immediately show:
 
 - what was analyzed;
+- how the material was read when that matters for reliability;
 - what the main compliance issues are;
 - what evidence supports them;
 - what is still uncertain;
@@ -51,12 +52,13 @@ Every client-facing report must contain, at minimum:
 1. report identification;
 2. executive summary;
 3. analysis scope;
-4. applied review rules;
-5. main compliance findings;
-6. supporting evidence references;
-7. unresolved points or limitations;
-8. next review priorities;
-9. annexes or technical appendices when needed.
+4. reading coverage and extraction provenance;
+5. applied review rules;
+6. main compliance findings;
+7. supporting evidence references;
+8. unresolved points or limitations;
+9. next review priorities;
+10. annexes or technical appendices when needed.
 
 ## First-Page Requirement
 
@@ -64,6 +66,7 @@ The opening section of the report must let the client understand, without readin
 
 - the analyzed scope;
 - the overall compliance situation found in the batch;
+- whether part of the batch depended on OCR or remained unreadable;
 - the highest-priority issues;
 - the recommended next actions.
 
@@ -97,6 +100,7 @@ The report must give an account of the system's work.
 At minimum, it must explain:
 
 - what the system reviewed;
+- how the system obtained the readable text;
 - what the system concluded;
 - why it concluded that;
 - what the system could not conclude safely.

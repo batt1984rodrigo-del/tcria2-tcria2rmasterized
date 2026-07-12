@@ -57,7 +57,24 @@ The final document must explain the review result clearly on first reading. It m
 - `[check_3]`
 - `[check_4]`
 
-## 4. Applied Review Rules
+## 4. Reading Coverage And Extraction Provenance
+
+### Reading snapshot
+
+- Documents with direct text extraction: `[direct_text_count]`
+- Documents read through OCR fallback: `[ocr_text_count]`
+- Documents where OCR failed: `[ocr_failed_count]`
+- Reading confidence rule: `[reading_confidence_rule]`
+
+### Reading register
+
+| Document | Read method | OCR status | Reading confidence | Notes |
+| --- | --- | --- | --- | --- |
+| `[document_name]` | `[read_method]` | `[ocr_status]` | `[reading_confidence]` | `[reading_note]` |
+
+The final report must never hide which reading method was used.
+
+## 5. Applied Review Rules
 
 `[short explanation of the rule set used to classify findings]`
 
@@ -68,7 +85,7 @@ The final document must explain the review result clearly on first reading. It m
 - `Attention`: `[attention_definition]`
 - `Informational`: `[informational_definition]`
 
-## 5. Main Findings
+## 6. Main Findings
 
 Repeat the block below for each major finding.
 
@@ -102,13 +119,13 @@ Repeat the block below for each major finding.
 
 ---
 
-## 6. Evidence Reference Register
+## 7. Evidence Reference Register
 
 | Evidence id | Document | Reference | Why it matters |
 | --- | --- | --- | --- |
 | `[evidence_id]` | `[document_name]` | `[page_or_section]` | `[evidence_reason]` |
 
-## 7. Unresolved Points And Limitations
+## 8. Unresolved Points And Limitations
 
 ### Unresolved points
 
@@ -121,14 +138,13 @@ Repeat the block below for each major finding.
 - `[limit_2]`
 - `[limit_3]`
 
-## 8. Next Review Priorities
+## 9. Next Review Priorities
 
 1. `[next_priority_1]`
 2. `[next_priority_2]`
 3. `[next_priority_3]`
 
-## 9. Annexes
+## 10. Annexes
 
 - `[annex_1]`
 - `[annex_2]`
-

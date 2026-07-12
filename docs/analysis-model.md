@@ -23,6 +23,21 @@ The minimum evaluation sequence is:
 5. apply the configured review rules;
 6. produce graded results instead of default pass/fail blocking.
 
+## Reading Pipeline Rule
+
+See also: [Reading Pipeline](reading-pipeline.md)
+
+The reading layer should prefer direct text extraction first.
+
+For PDFs:
+
+1. if direct extraction returns usable text, keep that result and do not run OCR;
+2. if direct extraction returns no text or fails, attempt OCR automatically;
+3. if OCR succeeds, record that the document was read through OCR fallback;
+4. if OCR fails, record that failure explicitly instead of hiding the document behind a generic read failure.
+
+The report must preserve this provenance for the user.
+
 ## Operational Rules
 
 The Core should follow these rules:
@@ -34,6 +49,8 @@ The Core should follow these rules:
 5. expose what was read and what could not be read;
 6. keep conclusions linked to evidence;
 7. allow graded severity instead of binary approval logic.
+8. expose whether text came from direct extraction or OCR fallback;
+9. expose reading confidence when available.
 
 ## Review Rules
 

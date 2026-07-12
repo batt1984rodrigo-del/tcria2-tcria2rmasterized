@@ -62,6 +62,9 @@ Legacy items may contain fields such as:
 - `classification_reasons`
 - `text_quality`
 - `extraction_status`
+- `reading_method`
+- `ocr_status`
+- `reading_confidence`
 - `gates`
 - `interpretation`
 - `key_signals`
@@ -78,6 +81,9 @@ The normalizer should produce a simpler summary model with concepts such as:
 - files unreadable or empty;
 - partially usable files;
 - files with insufficient text;
+- direct extraction counts;
+- OCR fallback counts;
+- OCR failure counts;
 - classification totals;
 - document outcomes;
 - gate warnings and not-evaluated states;
@@ -94,6 +100,7 @@ The adapted report should:
 
 - explain the legacy batch in plain language;
 - make coverage visible before interpretation;
+- make the reading method visible before interpretation;
 - preserve uncertainty and limitations;
 - act as a migration bridge, not as the final executive report.
 

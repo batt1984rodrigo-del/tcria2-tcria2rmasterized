@@ -69,6 +69,7 @@ The current repository foundation assumes:
 - [Naming Boundaries](docs/naming-boundaries.md)
 - [Product Definition](docs/product-vision.md)
 - [Analysis Model](docs/analysis-model.md)
+- [Reading Pipeline](docs/reading-pipeline.md)
 - [Governance Profiles](docs/governance-profiles.md)
 - [Integration Readiness](docs/integration-readiness.md)
 - [Legacy Output Lessons](docs/legacy-output-lessons.md)
@@ -87,6 +88,7 @@ The current work in this repository is to define TCRIA objectively as a product:
 
 - what document batch enters the system;
 - how the batch is processed;
+- how direct extraction and OCR fallback are exposed to the user;
 - what the compliance review report must contain;
 - how the report must be formatted for immediate client understanding;
 - how imperfect material is handled;

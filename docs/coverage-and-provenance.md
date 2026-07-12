@@ -40,7 +40,7 @@ It does not decide guilt, fraud, or liability.
 Every visible section in the generated Markdown should map back to legacy fields:
 
 - batch overview comes from top-level batch metadata;
-- reading coverage comes from `extraction_status`, `text_quality`, and `extractable_text_chars`;
+- reading coverage comes from `extraction_status`, `text_quality`, `extractable_text_chars`, `reading_method`, `ocr_status`, and `reading_confidence`;
 - classifications come from `classification_counts` or equivalent per-document derivation;
 - outcomes come from `overall_outcome` and gate statuses;
 - document map comes from per-document fields such as `file_name`, `classification`, and `gates`;
@@ -59,6 +59,7 @@ Examples:
 - `BLOCKED` means processing or decision constraints remain; it does not mean the document is useless;
 - `NOT_EVALUATED` means the gate did not close; it does not mean the document failed;
 - `WARN` means the reading carries a caution flag; it does not mean there is no useful signal.
+- `ocr_failed` means OCR fallback did not recover usable text; it does not mean the document is irrelevant forever.
 
 ## Sanitization Rule
 
