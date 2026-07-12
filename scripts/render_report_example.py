@@ -39,7 +39,12 @@ def bullet_lines(items: list[str]) -> str:
     return "\n".join(f"- {item}" for item in items)
 
 
+def reading_summary(data: dict[str, Any]) -> dict[str, Any]:
+    return data["reading_coverage_summary"]
+
+
 def render_markdown(data: dict[str, Any]) -> str:
+    reading = reading_summary(data)
     lines: list[str] = []
     lines.append(f"# {data['report_title']}")
     lines.append("")
@@ -81,11 +86,31 @@ def render_markdown(data: dict[str, Any]) -> str:
     lines.append("")
     lines.append(bullet_lines(data["checks"]))
     lines.append("")
-    lines.append("## 4. Applied Review Rules")
+    lines.append("## 4. Reading Coverage And Extraction Provenance")
+    lines.append("")
+    lines.append("### Reading Snapshot")
+    lines.append("")
+    lines.append(f"- Documents with direct text extraction: `{reading['direct_text_documents']}`")
+    lines.append(f"- Documents read through OCR fallback: `{reading['ocr_text_documents']}`")
+    lines.append(f"- Documents where OCR failed: `{reading['ocr_failed_documents']}`")
+    lines.append(f"- Reading confidence rule: `{reading['reading_confidence_rule']}`")
+    lines.append("")
+    lines.append("### Reading Register")
+    lines.append("")
+    lines.append("| Document | Read method | OCR status | Reading confidence | Notes |")
+    lines.append("| --- | --- | --- | --- | --- |")
+    for item in data["reading_register"]:
+        lines.append(
+            f"| {item['document']} | {item['read_method']} | {item['ocr_status']} | {item['reading_confidence']} | {item['notes']} |"
+        )
+    lines.append("")
+    lines.append("The report does not hide which reading method was used for the reviewed material.")
+    lines.append("")
+    lines.append("## 5. Applied Review Rules")
     lines.append("")
     lines.append(data["rules_summary"])
     lines.append("")
-    lines.append("## 5. Main Findings")
+    lines.append("## 6. Main Findings")
     lines.append("")
     for item in data["findings"]:
         lines.append(f"### {item['finding_id']} - {item['title']}")
@@ -113,7 +138,7 @@ def render_markdown(data: dict[str, Any]) -> str:
         for follow_up in item["follow_up"]:
             lines.append(f"- {follow_up}")
         lines.append("")
-    lines.append("## 6. Evidence Reference Register")
+    lines.append("## 7. Evidence Reference Register")
     lines.append("")
     lines.append("| Evidence id | Document | Reference | Why it matters |")
     lines.append("| --- | --- | --- | --- |")
@@ -122,7 +147,7 @@ def render_markdown(data: dict[str, Any]) -> str:
             f"| {item['evidence_id']} | {item['document']} | {item['reference']} | {item['why_it_matters']} |"
         )
     lines.append("")
-    lines.append("## 7. Unresolved Points And Limitations")
+    lines.append("## 8. Unresolved Points And Limitations")
     lines.append("")
     lines.append("### Unresolved Points")
     lines.append("")
@@ -132,12 +157,12 @@ def render_markdown(data: dict[str, Any]) -> str:
     lines.append("")
     lines.append(bullet_lines(data["limits"]))
     lines.append("")
-    lines.append("## 8. Next Review Priorities")
+    lines.append("## 9. Next Review Priorities")
     lines.append("")
     for idx, item in enumerate(data["next_priorities"], start=1):
         lines.append(f"{idx}. {item}")
     lines.append("")
-    lines.append("## 9. Annexes")
+    lines.append("## 10. Annexes")
     lines.append("")
     lines.append(bullet_lines(data["annexes"]))
     lines.append("")
@@ -285,6 +310,71 @@ def issue_summary_table(data: dict[str, Any]) -> Table:
         ]
     )
     table.setStyle(style)
+    return table
+
+
+def reading_summary_table(data: dict[str, Any]) -> Table:
+    reading = reading_summary(data)
+    rows = [
+        ["Reading metric", "Value"],
+        ["Direct text extraction", str(reading["direct_text_documents"])],
+        ["OCR fallback success", str(reading["ocr_text_documents"])],
+        ["OCR failed", str(reading["ocr_failed_documents"])],
+        ["Confidence rule", reading["reading_confidence_rule"]],
+    ]
+    table = Table(rows, colWidths=[54 * mm, 112 * mm], repeatRows=1)
+    table.setStyle(
+        TableStyle(
+            [
+                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#0f172a")),
+                ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                ("FONTNAME", (0, 1), (-1, -1), "Helvetica"),
+                ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#f8fafc")]),
+                ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#cbd5e1")),
+                ("FONTSIZE", (0, 0), (-1, -1), 8.2),
+                ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                ("LEFTPADDING", (0, 0), (-1, -1), 5),
+                ("RIGHTPADDING", (0, 0), (-1, -1), 5),
+                ("TOPPADDING", (0, 0), (-1, -1), 4),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+            ]
+        )
+    )
+    return table
+
+
+def reading_register_table(data: dict[str, Any]) -> Table:
+    rows = [["Document", "Read method", "OCR status", "Confidence", "Notes"]]
+    for item in data["reading_register"]:
+        rows.append(
+            [
+                item["document"],
+                item["read_method"],
+                item["ocr_status"],
+                item["reading_confidence"],
+                item["notes"],
+            ]
+        )
+    table = Table(rows, colWidths=[46 * mm, 24 * mm, 30 * mm, 22 * mm, 44 * mm], repeatRows=1)
+    table.setStyle(
+        TableStyle(
+            [
+                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#0f172a")),
+                ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                ("FONTNAME", (0, 1), (-1, -1), "Helvetica"),
+                ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#f8fafc")]),
+                ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#cbd5e1")),
+                ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                ("FONTSIZE", (0, 0), (-1, -1), 7.3),
+                ("LEFTPADDING", (0, 0), (-1, -1), 4),
+                ("RIGHTPADDING", (0, 0), (-1, -1), 4),
+                ("TOPPADDING", (0, 0), (-1, -1), 4),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+            ]
+        )
+    )
     return table
 
 
@@ -448,6 +538,17 @@ def render_pdf(data: dict[str, Any]) -> None:
         Spacer(1, 6),
         Paragraph("What was checked", styles["SubHeading"]),
         *bullet_paragraphs(data["checks"], styles["Body"]),
+        Spacer(1, 8),
+        Paragraph("Reading coverage and extraction provenance", styles["SectionHeading"]),
+        reading_summary_table(data),
+        Spacer(1, 6),
+        Paragraph("Reading register", styles["SubHeading"]),
+        reading_register_table(data),
+        Spacer(1, 6),
+        Paragraph(
+            "The report does not hide which reading method was used for the reviewed material.",
+            styles["Small"],
+        ),
         Spacer(1, 8),
         Paragraph("Applied review rules", styles["SectionHeading"]),
         Paragraph(safe(data["rules_summary"]), styles["Body"]),

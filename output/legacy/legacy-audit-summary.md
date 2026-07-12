@@ -11,6 +11,9 @@
 - Arquivos `unreadable` ou `unreadable_or_empty`: `1`
 - Arquivos parcialmente aproveitáveis: `2`
 - Arquivos sem texto suficiente: `1`
+- Texto extraido diretamente: `2`
+- Texto obtido por OCR: `1`
+- OCR falhou: `1`
 
 ## 3. Classificações
 | Classificação | Quantidade |
@@ -29,12 +32,12 @@
 - Gates com `NOT_EVALUATED`: `2`
 
 ## 5. Mapa de documentos
-| Documento | Classificação | Extraction status | Text quality | Overall outcome | Gates principais |
-| --- | --- | --- | --- | --- | --- |
-| `contract-adjustment-alpha.pdf` | `ACCUSATORY_CANDIDATE` | `ok` | `medium` | `BLOCKED (complianceGate)` | complianceGate=BLOCKED; prescriptiveGate=PASS; traceabilityCheck=WARN |
-| `supplier-review-note-beta.pdf` | `ACCUSATORY_CANDIDATE` | `ok` | `medium` | `PARTIAL_PASS (traceability warning; static audit)` | complianceGate=PASS; prescriptiveGate=PASS; traceabilityCheck=WARN |
-| `control-checklist-gamma.csv` | `SUPPORTING_EVIDENCE_RELEVANT` | `ok` | `high` | `PASS` | not exposed in legacy item |
-| `unreadable-scan-delta.pdf` | `UNREADABLE` | `unreadable_or_empty` | `low` | `NOT_EVALUATED` | complianceGate=NOT_EVALUATED; prescriptiveGate=NOT_EVALUATED |
+| Documento | Classificação | Extraction status | Text quality | Metodo de leitura | OCR status | Confianca | Overall outcome | Gates principais |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `contract-adjustment-alpha.pdf` | `ACCUSATORY_CANDIDATE` | `ok` | `medium` | `direct_text` | `not_needed` | `medium` | `BLOCKED (complianceGate)` | complianceGate=BLOCKED; prescriptiveGate=PASS; traceabilityCheck=WARN |
+| `supplier-review-note-beta.pdf` | `ACCUSATORY_CANDIDATE` | `ok` | `medium` | `ocr_text` | `attempted_success` | `medium` | `PARTIAL_PASS (traceability warning; static audit)` | complianceGate=PASS; prescriptiveGate=PASS; traceabilityCheck=WARN |
+| `control-checklist-gamma.csv` | `SUPPORTING_EVIDENCE_RELEVANT` | `ok` | `high` | `direct_text` | `not_applicable` | `high` | `PASS` | not exposed in legacy item |
+| `unreadable-scan-delta.pdf` | `UNREADABLE` | `unreadable_or_empty` | `low` | `ocr_failed` | `attempted_failed` | `low` | `NOT_EVALUATED` | complianceGate=NOT_EVALUATED; prescriptiveGate=NOT_EVALUATED |
 
 ## 6. Principais sinais encontrados
 - Datas: 2026-06-02, 2026-06-03, 2026-06-18, 2026-06-21, 2026-06-27

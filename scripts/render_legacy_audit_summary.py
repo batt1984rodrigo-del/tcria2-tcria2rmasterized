@@ -75,6 +75,29 @@ def normalized_outcome(item: dict[str, Any]) -> str:
     return normalized_text(item.get("overall_outcome"), "NOT_REPORTED")
 
 
+def normalized_reading_method(item: dict[str, Any]) -> str:
+    method = normalized_text(item.get("reading_method"), "").lower()
+    if method:
+        return method
+    ocr_status = normalized_ocr_status(item)
+    status = normalized_extraction_status(item)
+    if ocr_status == "attempted_success":
+        return "ocr_text"
+    if ocr_status == "attempted_failed":
+        return "ocr_failed"
+    if status == "ok":
+        return "direct_text"
+    return "unknown"
+
+
+def normalized_ocr_status(item: dict[str, Any]) -> str:
+    return normalized_text(item.get("ocr_status"), "unknown").lower()
+
+
+def normalized_reading_confidence(item: dict[str, Any]) -> str:
+    return normalized_text(item.get("reading_confidence"), normalized_text_quality(item)).lower()
+
+
 def file_name(item: dict[str, Any]) -> str:
     name = item.get("file_name")
     if name:
@@ -121,6 +144,15 @@ def classification_counts(payload: dict[str, Any], items: list[dict[str, Any]]) 
         return {str(key): int(value) for key, value in raw_counts.items()}
     counts = Counter(normalized_classification(item) for item in items)
     return dict(counts)
+
+
+def reading_method_counts(items: list[dict[str, Any]]) -> dict[str, int]:
+    counts = {"direct_text": 0, "ocr_text": 0, "ocr_failed": 0}
+    for item in items:
+        method = normalized_reading_method(item)
+        if method in counts:
+            counts[method] += 1
+    return counts
 
 
 def document_outcome_counts(items: list[dict[str, Any]]) -> dict[str, int]:
@@ -261,6 +293,7 @@ def build_report(payload: dict[str, Any]) -> dict[str, Any]:
     gate_counts = gate_status_counts(items)
     outcomes = document_outcome_counts(items)
     counts = classification_counts(payload, items)
+    reading_counts = reading_method_counts(items)
     signals = aggregate_signals(items)
     unreadable_count = sum(1 for item in items if is_unreadable(item))
     ok_count = sum(1 for item in items if normalized_extraction_status(item) == "ok")
@@ -277,6 +310,7 @@ def build_report(payload: dict[str, Any]) -> dict[str, Any]:
         "classification_counts": counts,
         "document_outcomes": outcomes,
         "gate_counts": gate_counts,
+        "reading_counts": reading_counts,
         "signals": signals,
         "coverage": {
             "ok_count": ok_count,
@@ -290,6 +324,9 @@ def build_report(payload: dict[str, Any]) -> dict[str, Any]:
                 "classification": normalized_classification(item),
                 "extraction_status": normalized_extraction_status(item),
                 "text_quality": normalized_text_quality(item),
+                "reading_method": normalized_reading_method(item),
+                "ocr_status": normalized_ocr_status(item),
+                "reading_confidence": normalized_reading_confidence(item),
                 "overall_outcome": normalized_outcome(item),
                 "gate_summary": summarize_gates(item),
             }
@@ -303,6 +340,7 @@ def render_markdown(report: dict[str, Any]) -> str:
     counts = report["classification_counts"]
     outcomes = report["document_outcomes"]
     gate_counts = report["gate_counts"]
+    reading_counts = report["reading_counts"]
     coverage = report["coverage"]
     signals = report["signals"]
 
@@ -320,6 +358,9 @@ def render_markdown(report: dict[str, Any]) -> str:
     lines.append(f"- Arquivos `unreadable` ou `unreadable_or_empty`: `{coverage['unreadable_count']}`")
     lines.append(f"- Arquivos parcialmente aproveitáveis: `{coverage['partial_count']}`")
     lines.append(f"- Arquivos sem texto suficiente: `{coverage['insufficient_text_count']}`")
+    lines.append(f"- Texto extraido diretamente: `{reading_counts['direct_text']}`")
+    lines.append(f"- Texto obtido por OCR: `{reading_counts['ocr_text']}`")
+    lines.append(f"- OCR falhou: `{reading_counts['ocr_failed']}`")
     lines.append("")
     lines.append("## 3. Classificações")
     lines.append("| Classificação | Quantidade |")
@@ -338,11 +379,11 @@ def render_markdown(report: dict[str, Any]) -> str:
     lines.append(f"- Gates com `NOT_EVALUATED`: `{gate_counts['NOT_EVALUATED']}`")
     lines.append("")
     lines.append("## 5. Mapa de documentos")
-    lines.append("| Documento | Classificação | Extraction status | Text quality | Overall outcome | Gates principais |")
-    lines.append("| --- | --- | --- | --- | --- | --- |")
+    lines.append("| Documento | Classificação | Extraction status | Text quality | Metodo de leitura | OCR status | Confianca | Overall outcome | Gates principais |")
+    lines.append("| --- | --- | --- | --- | --- | --- | --- | --- | --- |")
     for doc in docs:
         lines.append(
-            "| `{file_name}` | `{classification}` | `{extraction_status}` | `{text_quality}` | `{overall_outcome}` | {gate_summary} |".format(
+            "| `{file_name}` | `{classification}` | `{extraction_status}` | `{text_quality}` | `{reading_method}` | `{ocr_status}` | `{reading_confidence}` | `{overall_outcome}` | {gate_summary} |".format(
                 **doc
             )
         )

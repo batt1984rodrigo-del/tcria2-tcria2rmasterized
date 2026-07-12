@@ -21,6 +21,42 @@
   "document_types": "contracts, approval forms, vendor onboarding files, exception memos, email exports",
   "business_area": "Procurement and Vendor Management",
   "period_covered": "2026-04-01 to 2026-06-30",
+  "reading_coverage_summary": {
+    "direct_text_documents": 38,
+    "ocr_text_documents": 7,
+    "ocr_failed_documents": 2,
+    "reading_confidence_rule": "Confidence reflects reading quality only and does not replace compliance certainty."
+  },
+  "reading_register": [
+    {
+      "document": "AM-17 Contract Amendment.pdf",
+      "read_method": "direct_text",
+      "ocr_status": "not_needed",
+      "reading_confidence": "high",
+      "notes": "Embedded text was available on all reviewed pages."
+    },
+    {
+      "document": "Supplier Due Diligence Scan S-04.pdf",
+      "read_method": "ocr_text",
+      "ocr_status": "attempted_success",
+      "reading_confidence": "medium",
+      "notes": "Direct extraction returned no usable text; OCR recovered most checklist content."
+    },
+    {
+      "document": "Emergency Exception Memo 03.pdf",
+      "read_method": "ocr_failed",
+      "ocr_status": "attempted_failed",
+      "reading_confidence": "low",
+      "notes": "Scan quality remained insufficient after OCR fallback."
+    },
+    {
+      "document": "Approval Index Q2.xlsx",
+      "read_method": "direct_text",
+      "ocr_status": "not_applicable",
+      "reading_confidence": "high",
+      "notes": "Native tabular text was read directly."
+    }
+  ],
   "checks": [
     "approval trail completeness",
     "vendor due diligence support",
@@ -120,7 +156,7 @@
   "limits": [
     "The review is limited to the submitted document batch.",
     "No direct system-of-record validation was performed.",
-    "Unreadable scans may hide additional supporting evidence."
+    "Two PDF scans remained weak even after automatic OCR fallback."
   ],
   "next_priorities": [
     "Recover approval support for high-value amendments.",
@@ -133,4 +169,3 @@
     "Rule set reference"
   ]
 }
-

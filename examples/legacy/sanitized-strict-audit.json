@@ -35,6 +35,9 @@
       ],
       "text_quality": "medium",
       "extraction_status": "ok",
+      "reading_method": "direct_text",
+      "ocr_status": "not_needed",
+      "reading_confidence": "medium",
       "extractable_text_chars": 842,
       "gates": {
         "prescriptiveGate": {
@@ -82,6 +85,9 @@
       ],
       "text_quality": "medium",
       "extraction_status": "ok",
+      "reading_method": "ocr_text",
+      "ocr_status": "attempted_success",
+      "reading_confidence": "medium",
       "extractable_text_chars": 526,
       "gates": {
         "prescriptiveGate": {
@@ -128,6 +134,9 @@
       ],
       "text_quality": "high",
       "extraction_status": "ok",
+      "reading_method": "direct_text",
+      "ocr_status": "not_applicable",
+      "reading_confidence": "high",
       "extractable_text_chars": 1580,
       "gates": null,
       "key_signals": {
@@ -161,6 +170,9 @@
       ],
       "text_quality": "low",
       "extraction_status": "unreadable_or_empty",
+      "reading_method": "ocr_failed",
+      "ocr_status": "attempted_failed",
+      "reading_confidence": "low",
       "extractable_text_chars": 0,
       "gates": {
         "prescriptiveGate": {

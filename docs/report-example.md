@@ -42,11 +42,31 @@ Review of procurement and vendor management documents related to contract approv
 - exception justification records
 - contract conformity against internal thresholds
 
-## 4. Applied Review Rules
+## 4. Reading Coverage And Extraction Provenance
+
+### Reading Snapshot
+
+- Documents with direct text extraction: `38`
+- Documents read through OCR fallback: `7`
+- Documents where OCR failed: `2`
+- Reading confidence rule: `Confidence reflects reading quality only and does not replace compliance certainty.`
+
+### Reading Register
+
+| Document | Read method | OCR status | Reading confidence | Notes |
+| --- | --- | --- | --- | --- |
+| AM-17 Contract Amendment.pdf | direct_text | not_needed | high | Embedded text was available on all reviewed pages. |
+| Supplier Due Diligence Scan S-04.pdf | ocr_text | attempted_success | medium | Direct extraction returned no usable text; OCR recovered most checklist content. |
+| Emergency Exception Memo 03.pdf | ocr_failed | attempted_failed | low | Scan quality remained insufficient after OCR fallback. |
+| Approval Index Q2.xlsx | direct_text | not_applicable | high | Native tabular text was read directly. |
+
+The report does not hide which reading method was used for the reviewed material.
+
+## 5. Applied Review Rules
 
 The review rules classify findings by evidence completeness, traceability, approval support, and conformity with documented procurement controls.
 
-## 5. Main Findings
+## 6. Main Findings
 
 ### F-01 - Missing approval trail for high-value contract amendments
 
@@ -126,7 +146,7 @@ Inconsistent exception records make it difficult to determine whether nonstandar
 - Create a reconciled list of all emergency exceptions in the batch.
 - Verify whether each exception has a matching approval record.
 
-## 6. Evidence Reference Register
+## 7. Evidence Reference Register
 
 | Evidence id | Document | Reference | Why it matters |
 | --- | --- | --- | --- |
@@ -134,7 +154,7 @@ Inconsistent exception records make it difficult to determine whether nonstandar
 | E-02 | Approval Index Q2.xlsx | Row 118 | Flags approval record as pending. |
 | E-03 | Vendor Checklist Pack.zip | Supplier folders S-04 to S-08 | Shows missing due diligence attachments for strategic suppliers. |
 
-## 7. Unresolved Points And Limitations
+## 8. Unresolved Points And Limitations
 
 ### Unresolved Points
 
@@ -145,15 +165,15 @@ Inconsistent exception records make it difficult to determine whether nonstandar
 
 - The review is limited to the submitted document batch.
 - No direct system-of-record validation was performed.
-- Unreadable scans may hide additional supporting evidence.
+- Two PDF scans remained weak even after automatic OCR fallback.
 
-## 8. Next Review Priorities
+## 9. Next Review Priorities
 
 1. Recover approval support for high-value amendments.
 2. Close due diligence evidence gaps for strategic suppliers.
 3. Normalize exception records and reconcile them against approvals.
 
-## 9. Annexes
+## 10. Annexes
 
 - Detailed evidence register
 - Full document inventory
