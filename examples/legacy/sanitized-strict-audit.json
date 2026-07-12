@@ -1,0 +1,132 @@
+{
+  "generated_at": "2026-04-23T11:25:36",
+  "audit_basis": "TCRIA modular engine audit (prescriptiveGate, complianceGate, traceabilityCheck)",
+  "input_path": "/sanitized/acme-corp/procurement-batch-q2",
+  "mode": "strict-explicit-decision-record",
+  "compliance_gate_mode": "strict-explicit-decision-record",
+  "total_files_scanned": 4,
+  "accusation_set_count": 2,
+  "classification_counts": {
+    "ACCUSATORY_CANDIDATE": 2,
+    "SUPPORTING_EVIDENCE_RELEVANT": 1,
+    "UNREADABLE": 1
+  },
+  "route_counts": {
+    "CIVIL_CRIMINAL_INVESTIGATIVE": 2,
+    "EVIDENTIARY_SUPPORT_GENERAL": 1,
+    "UNDETERMINED": 1
+  },
+  "document_role_counts": {
+    "SUPPORTING_PROOF": 2,
+    "UNDETERMINED": 1,
+    "PROCEDURAL_REQUEST": 1
+  },
+  "accusation_set": [
+    {
+      "file_name": "contract-amendment-17.pdf",
+      "file_path": "/sanitized/acme-corp/procurement-batch-q2/contract-amendment-17.pdf",
+      "classification": "ACCUSATORY_CANDIDATE",
+      "summary": "High-value amendment found without strong approval support in the reviewed batch.",
+      "overall_outcome": "BLOCKED (complianceGate)",
+      "classification_reasons": [
+        "Missing approval support",
+        "High-value contract change",
+        "Traceability expectation not fully satisfied"
+      ],
+      "text_quality": "medium",
+      "extraction_status": "ok",
+      "gates": {
+        "prescriptiveGate": {
+          "status": "PASS",
+          "reason": "No prescriptive patterns detected."
+        },
+        "complianceGate": {
+          "status": "BLOCKED",
+          "reason": "DecisionRecord header not found in strict mode."
+        },
+        "traceabilityCheck": {
+          "status": "WARN",
+          "reason": "Limited traceability signals found."
+        }
+      },
+      "key_signals": {
+        "evidence_marker_hits": {},
+        "target_entity_hits": {
+          "acme corp": 2
+        }
+      }
+    },
+    {
+      "file_name": "vendor-boarding-form.pdf",
+      "file_path": "/sanitized/acme-corp/procurement-batch-q2/vendor-boarding-form.pdf",
+      "classification": "ACCUSATORY_CANDIDATE",
+      "summary": "Vendor file contains a declared review record but only partial due diligence support.",
+      "overall_outcome": "PARTIAL_PASS (traceability warning; static audit)",
+      "classification_reasons": [
+        "Supporting approval record present",
+        "Due diligence evidence incomplete",
+        "Traceability signals limited"
+      ],
+      "text_quality": "medium",
+      "extraction_status": "ok",
+      "gates": {
+        "prescriptiveGate": {
+          "status": "PASS",
+          "reason": "No prescriptive patterns detected."
+        },
+        "complianceGate": {
+          "status": "PASS",
+          "reason": "DecisionRecord requirements satisfied."
+        },
+        "traceabilityCheck": {
+          "status": "WARN",
+          "reason": "Limited traceability signals found."
+        }
+      },
+      "key_signals": {
+        "evidence_marker_hits": {
+          "checklist": 1
+        }
+      }
+    }
+  ],
+  "non_accusation_set": [
+    {
+      "file_name": "vendor-checklist-register.csv",
+      "file_path": "/sanitized/acme-corp/procurement-batch-q2/vendor-checklist-register.csv",
+      "classification": "SUPPORTING_EVIDENCE_RELEVANT",
+      "summary": "Register contains evidence of required checklist controls for multiple suppliers.",
+      "overall_outcome": "PASS",
+      "classification_reasons": [
+        "Supporting evidence markers identified",
+        "Document role suggests supporting proof"
+      ],
+      "text_quality": "high",
+      "extraction_status": "ok",
+      "gates": null,
+      "key_signals": {
+        "evidence_marker_hits": {
+          "checklist": 5,
+          "supplier id": 8
+        }
+      }
+    },
+    {
+      "file_name": "scanned-exception-request.pdf",
+      "file_path": "/sanitized/acme-corp/procurement-batch-q2/scanned-exception-request.pdf",
+      "classification": "UNREADABLE",
+      "summary": "The file could not be read reliably from the submitted batch.",
+      "overall_outcome": null,
+      "classification_reasons": [
+        "Unreadable scan",
+        "Insufficient extraction quality"
+      ],
+      "text_quality": "low",
+      "extraction_status": "error",
+      "gates": null,
+      "key_signals": {
+        "evidence_marker_hits": {}
+      }
+    }
+  ]
+}
