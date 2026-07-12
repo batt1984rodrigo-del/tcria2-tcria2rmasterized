@@ -2,6 +2,8 @@
 
 This document defines how TCRIA should evaluate document batches for compliance review.
 
+See also: [Governance Profiles](governance-profiles.md)
+
 ## Core Rule
 
 TCRIA must separate document reading from risk judgment.

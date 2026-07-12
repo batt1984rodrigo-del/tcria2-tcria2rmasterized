@@ -69,12 +69,14 @@ The current repository foundation assumes:
 - [Naming Boundaries](docs/naming-boundaries.md)
 - [Product Definition](docs/product-vision.md)
 - [Analysis Model](docs/analysis-model.md)
+- [Governance Profiles](docs/governance-profiles.md)
 - [Output Specification](docs/output-philosophy.md)
 - [Output Taxonomy](docs/output-taxonomy.md)
 - [Report Contract](docs/report-contract.md)
 - [Report Template](docs/report-template.md)
 - [Architecture Layers](docs/architecture/layers.md)
 - [Non-Goals](docs/non-goals.md)
+- [Contributing](CONTRIBUTING.md)
 
 ## Current Repository Focus
 
