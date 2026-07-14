@@ -7,6 +7,11 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
+from client_language import (
+    client_label_for_classification,
+    summarize_document_for_client,
+    translate_client_text,
+)
 from reasoning_policy import build_legacy_reasoning_summary
 
 
@@ -335,12 +340,14 @@ def build_report(payload: dict[str, Any]) -> dict[str, Any]:
             for item in items
         ],
     }
+    report["client_documents"] = [summarize_document_for_client(doc) for doc in report["documents"]]
     report["reasoning"] = build_legacy_reasoning_summary(report)
     return report
 
 
 def render_markdown(report: dict[str, Any]) -> str:
     docs = report["documents"]
+    client_docs = report["client_documents"]
     counts = report["classification_counts"]
     outcomes = report["document_outcomes"]
     gate_counts = report["gate_counts"]
@@ -350,41 +357,67 @@ def render_markdown(report: dict[str, Any]) -> str:
     reasoning = report["reasoning"]
 
     lines: list[str] = []
-    lines.append("# Resumo de Cobertura da Auditoria Legada")
+    lines.append("# Resumo para primeira leitura do lote legado")
     lines.append("")
-    lines.append("## 1. Visão geral do lote")
-    lines.append(f"- Total de arquivos escaneados: `{report['total_files_scanned']}`")
-    lines.append(f"- Modo de auditoria: `{report['mode']}`")
-    lines.append(f"- Data de geração: `{report['generated_at']}`")
-    lines.append(f"- Base técnica registrada: `{report['audit_basis']}`")
+    lines.append("## 1. O que ja da para ver")
+    lines.append(f"- Arquivos analisados: `{report['total_files_scanned']}`")
+    lines.append(f"- Documentos que ja podem ser usados agora: `{outcomes['PASS']}`")
+    lines.append(f"- Documentos que pedem cuidado ou complemento: `{outcomes['PARTIAL_PASS']}`")
+    lines.append(f"- Documentos que ainda nao podem ser usados agora: `{outcomes['BLOCKED']}`")
+    lines.append(f"- Documentos que ainda nao foi possivel avaliar: `{coverage['unreadable_count']}`")
     lines.append("")
-    lines.append("## 2. Cobertura da leitura")
-    lines.append(f"- Arquivos com `extraction_status = ok`: `{coverage['ok_count']}`")
-    lines.append(f"- Arquivos `unreadable` ou `unreadable_or_empty`: `{coverage['unreadable_count']}`")
-    lines.append(f"- Arquivos parcialmente aproveitáveis: `{coverage['partial_count']}`")
-    lines.append(f"- Arquivos sem texto suficiente: `{coverage['insufficient_text_count']}`")
-    lines.append(f"- Texto extraido diretamente: `{reading_counts['direct_text']}`")
-    lines.append(f"- Texto obtido por OCR: `{reading_counts['ocr_text']}`")
-    lines.append(f"- OCR falhou: `{reading_counts['ocr_failed']}`")
+    lines.append("## 2. Como os arquivos puderam ser lidos")
+    lines.append(f"- Arquivos lidos sem dificuldade relevante: `{coverage['ok_count']}`")
+    lines.append(f"- Arquivos lidos com aproveitamento parcial: `{coverage['partial_count']}`")
+    lines.append(f"- Arquivos com texto insuficiente: `{coverage['insufficient_text_count']}`")
+    lines.append(f"- Arquivos que dependeram de OCR: `{reading_counts['ocr_text']}`")
+    lines.append(f"- Arquivos em que o OCR nao recuperou texto suficiente: `{reading_counts['ocr_failed']}`")
     lines.append("")
-    lines.append("## 3. Classificações")
-    lines.append("| Classificação | Quantidade |")
+    lines.append("## 3. O que o lote mostra")
+    lines.append("| Leitura para o cliente | Quantidade |")
     lines.append("| --- | ---: |")
     for classification, quantity in sorted(counts.items(), key=lambda item: (-item[1], item[0])):
-        lines.append(f"| `{classification}` | `{quantity}` |")
-    lines.append(f"- `accusation_set_count`: `{report['accusation_set_count']}`")
+        lines.append(f"| {client_label_for_classification(classification)} | `{quantity}` |")
+    lines.append(f"- Documentos que podem indicar problema: `{report['accusation_set_count']}`")
     if report["non_accusation_set_count"] > 0:
-        lines.append(f"- `non_accusation_set`: `{report['non_accusation_set_count']}` documento(s)")
+        lines.append(f"- Documentos de apoio ou contexto: `{report['non_accusation_set_count']}`")
     lines.append("")
-    lines.append("## 4. Outcomes")
-    lines.append(f"- `PARTIAL_PASS`: `{outcomes['PARTIAL_PASS']}`")
-    lines.append(f"- `BLOCKED`: `{outcomes['BLOCKED']}`")
-    lines.append(f"- `PASS`: `{outcomes['PASS']}`")
+    lines.append("## 4. Documento por documento")
+    lines.append("| Documento | Esse documento ajuda o caso? | Pode ser usado agora? | Como foi a leitura? | Regras e origem |")
+    lines.append("| --- | --- | --- | --- | --- |")
+    for doc in client_docs:
+        lines.append(
+            "| `{file_name}` | {helps_case} | {can_use_now} | {reading_status} | {origin_and_rules} |".format(
+                **doc
+            )
+        )
+    lines.append("")
+    lines.append("## 5. Sinais que apareceram com mais forca")
+    lines.append(f"- Datas encontradas: {format_list(signals['dates_found'], 'nenhuma data agregada')}")
+    lines.append(
+        f"- Valores monetarios encontrados: {format_list(signals['currency_values_found'], 'nenhum valor monetario agregado')}"
+    )
+    lines.append(
+        f"- Mencoes a Pix: `{signals['pix_mentions_total']}` ocorrencia(s) em `{signals['pix_documents']}` documento(s)"
+    )
+    lines.append(f"- Marcadores de prova: {translate_client_text(format_counter(signals['evidence_markers']))}")
+    lines.append(f"- Termos que indicam problema: {translate_client_text(format_counter(signals['accusation_terms']))}")
+    lines.append("")
+    lines.append("## 6. Pendencias e cautelas")
+    lines.append(f"- Preservar incerteza: `{'sim' if reasoning['must_preserve_unknown'] else 'nao'}`")
+    lines.append(f"- Pedir mais documentos: `{'sim' if reasoning['must_request_more_documents'] else 'nao'}`")
+    lines.append(f"- Nota de cautela: {translate_client_text(reasoning['conclusion_note'])}")
+    lines.append("- Documento bloqueado nao e documento inutil. Ele apenas ainda nao sustenta um juizo mais forte.")
+    lines.append("- Documento ainda nao avaliado nao significa falha final. Significa limite de leitura ou de estrutura.")
+    lines.append("")
+    lines.append("## 7. Apendice tecnico resumido")
+    lines.append(f"- Modo tecnico registrado: `{report['mode']}`")
+    lines.append(f"- Base tecnica registrada: `{report['audit_basis']}`")
     lines.append(f"- Gates com `WARN`: `{gate_counts['WARN']}`")
     lines.append(f"- Gates com `NOT_EVALUATED`: `{gate_counts['NOT_EVALUATED']}`")
+    lines.append(f"- Policy de raciocinio: `{reasoning['policy_name']}`")
     lines.append("")
-    lines.append("## 5. Mapa de documentos")
-    lines.append("| Documento | Classificação | Extraction status | Text quality | Metodo de leitura | OCR status | Confianca | Overall outcome | Gates principais |")
+    lines.append("| Documento | Classificacao tecnica | Extraction status | Text quality | Metodo de leitura | OCR status | Confianca | Overall outcome | Gates principais |")
     lines.append("| --- | --- | --- | --- | --- | --- | --- | --- | --- |")
     for doc in docs:
         lines.append(
@@ -393,36 +426,9 @@ def render_markdown(report: dict[str, Any]) -> str:
             )
         )
     lines.append("")
-    lines.append("## 6. Principais sinais encontrados")
-    lines.append(f"- Datas: {format_list(signals['dates_found'], 'nenhuma data agregada')}")
-    lines.append(f"- Valores monetários: {format_list(signals['currency_values_found'], 'nenhum valor monetário agregado')}")
+    lines.append("## 8. Observacao final")
     lines.append(
-        f"- Menções a Pix: `{signals['pix_mentions_total']}` ocorrência(s) em `{signals['pix_documents']}` documento(s)"
-    )
-    lines.append(f"- Marcadores de evidência: {format_counter(signals['evidence_markers'])}")
-    lines.append(f"- Termos de acusação: {format_counter(signals['accusation_terms'])}")
-    lines.append("")
-    lines.append("## 7. Disciplina de raciocínio")
-    lines.append(f"- Policy: `{reasoning['policy_name']}`")
-    lines.append(
-        f"- Preservar incerteza: `{'sim' if reasoning['must_preserve_unknown'] else 'não'}`"
-    )
-    lines.append(
-        f"- Pedir mais documentos: `{'sim' if reasoning['must_request_more_documents'] else 'não'}`"
-    )
-    lines.append(f"- Postura de conclusão: `{reasoning['conclusion_posture']}`")
-    lines.append(f"- Nota: {reasoning['conclusion_note']}")
-    lines.append("")
-    lines.append("## 8. Limitações")
-    lines.append("- `BLOCKED` não significa descarte; significa que o lote pede revisão técnica ou complemento antes de um juízo mais forte.")
-    lines.append("- `NOT_EVALUATED` não significa falha; significa que aquele gate não pôde ser concluído com o material disponível.")
-    lines.append("- `WARN` significa leitura com ressalva; o documento ainda pode carregar sinal útil para compliance e rastreabilidade.")
-    lines.append("- Documento sem `DecisionRecord` pode continuar útil em perfil exploratório ou empresarial, mesmo fora do modo estrito.")
-    lines.append("")
-    lines.append("## 9. Observação final")
-    lines.append(
-        "Este resumo é uma ponte de migração do legado. Ele organiza cobertura de leitura, classificação e sinais técnicos, "
-        "mas não substitui o relatório executivo principal do produto."
+        "Este resumo organiza o legado em linguagem de primeira leitura, mas preserva um apendice tecnico para rastreabilidade."
     )
     lines.append("")
     return "\n".join(lines)
