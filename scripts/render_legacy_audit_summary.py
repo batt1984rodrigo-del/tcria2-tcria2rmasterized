@@ -7,6 +7,8 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
+from reasoning_policy import build_legacy_reasoning_summary
+
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_INPUT = ROOT / "examples" / "legacy" / "sanitized-strict-audit.json"
@@ -300,7 +302,7 @@ def build_report(payload: dict[str, Any]) -> dict[str, Any]:
     partial_count = sum(1 for item in items if is_partially_usable(item))
     insufficient_text_count = sum(1 for item in items if has_insufficient_text(item))
     non_accusation_count = len([item for item in payload.get("non_accusation_set") or [] if isinstance(item, dict)])
-    return {
+    report = {
         "generated_at": normalized_text(payload.get("generated_at")),
         "audit_basis": normalized_text(payload.get("audit_basis")),
         "mode": normalized_text(payload.get("mode") or payload.get("compliance_gate_mode")),
@@ -333,6 +335,8 @@ def build_report(payload: dict[str, Any]) -> dict[str, Any]:
             for item in items
         ],
     }
+    report["reasoning"] = build_legacy_reasoning_summary(report)
+    return report
 
 
 def render_markdown(report: dict[str, Any]) -> str:
@@ -343,6 +347,7 @@ def render_markdown(report: dict[str, Any]) -> str:
     reading_counts = report["reading_counts"]
     coverage = report["coverage"]
     signals = report["signals"]
+    reasoning = report["reasoning"]
 
     lines: list[str] = []
     lines.append("# Resumo de Cobertura da Auditoria Legada")
@@ -397,13 +402,24 @@ def render_markdown(report: dict[str, Any]) -> str:
     lines.append(f"- Marcadores de evidência: {format_counter(signals['evidence_markers'])}")
     lines.append(f"- Termos de acusação: {format_counter(signals['accusation_terms'])}")
     lines.append("")
-    lines.append("## 7. Limitações")
+    lines.append("## 7. Disciplina de raciocínio")
+    lines.append(f"- Policy: `{reasoning['policy_name']}`")
+    lines.append(
+        f"- Preservar incerteza: `{'sim' if reasoning['must_preserve_unknown'] else 'não'}`"
+    )
+    lines.append(
+        f"- Pedir mais documentos: `{'sim' if reasoning['must_request_more_documents'] else 'não'}`"
+    )
+    lines.append(f"- Postura de conclusão: `{reasoning['conclusion_posture']}`")
+    lines.append(f"- Nota: {reasoning['conclusion_note']}")
+    lines.append("")
+    lines.append("## 8. Limitações")
     lines.append("- `BLOCKED` não significa descarte; significa que o lote pede revisão técnica ou complemento antes de um juízo mais forte.")
     lines.append("- `NOT_EVALUATED` não significa falha; significa que aquele gate não pôde ser concluído com o material disponível.")
     lines.append("- `WARN` significa leitura com ressalva; o documento ainda pode carregar sinal útil para compliance e rastreabilidade.")
     lines.append("- Documento sem `DecisionRecord` pode continuar útil em perfil exploratório ou empresarial, mesmo fora do modo estrito.")
     lines.append("")
-    lines.append("## 8. Observação final")
+    lines.append("## 9. Observação final")
     lines.append(
         "Este resumo é uma ponte de migração do legado. Ele organiza cobertura de leitura, classificação e sinais técnicos, "
         "mas não substitui o relatório executivo principal do produto."

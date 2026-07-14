@@ -46,11 +46,18 @@
 - Marcadores de evidência: checklist=6, approval id=4, evidence ref=3, approval note=1, decisionrecord=1, purchase order=1
 - Termos de acusação: approval gap=2, exception request=1, incomplete verification=1
 
-## 7. Limitações
+## 7. Disciplina de raciocínio
+- Policy: `generic_reasoning_policy`
+- Preservar incerteza: `sim`
+- Pedir mais documentos: `sim`
+- Postura de conclusão: `bounded_only`
+- Nota: Current material does not support a stronger conclusion.
+
+## 8. Limitações
 - `BLOCKED` não significa descarte; significa que o lote pede revisão técnica ou complemento antes de um juízo mais forte.
 - `NOT_EVALUATED` não significa falha; significa que aquele gate não pôde ser concluído com o material disponível.
 - `WARN` significa leitura com ressalva; o documento ainda pode carregar sinal útil para compliance e rastreabilidade.
 - Documento sem `DecisionRecord` pode continuar útil em perfil exploratório ou empresarial, mesmo fora do modo estrito.
 
-## 8. Observação final
+## 9. Observação final
 Este resumo é uma ponte de migração do legado. Ele organiza cobertura de leitura, classificação e sinais técnicos, mas não substitui o relatório executivo principal do produto.

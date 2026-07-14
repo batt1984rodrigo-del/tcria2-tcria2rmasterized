@@ -66,6 +66,14 @@ The report does not hide which reading method was used for the reviewed material
 
 The review rules classify findings by evidence completeness, traceability, approval support, and conformity with documented procurement controls.
 
+### Reasoning Policy Check
+
+- Policy: `generic_reasoning_policy`
+- Runtime validation: `passed`
+- Findings reviewed: `3`
+- Findings kept inconclusive: `1`
+- Findings requiring document follow-up: `3`
+
 ## 6. Main Findings
 
 ### F-01 - Missing approval trail for high-value contract amendments

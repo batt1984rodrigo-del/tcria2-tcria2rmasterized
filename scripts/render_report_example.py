@@ -19,6 +19,8 @@ from reportlab.platypus import (
     TableStyle,
 )
 
+from reasoning_policy import apply_reasoning_policy
+
 
 ROOT = Path(__file__).resolve().parents[1]
 INPUT_JSON = ROOT / "docs" / "report-example.json"
@@ -27,7 +29,8 @@ OUTPUT_PDF = ROOT / "output" / "pdf" / "tcria-compliance-report-example.pdf"
 
 
 def load_data() -> dict[str, Any]:
-    return json.loads(INPUT_JSON.read_text(encoding="utf-8"))
+    raw_data = json.loads(INPUT_JSON.read_text(encoding="utf-8"))
+    return apply_reasoning_policy(raw_data)
 
 
 def safe(value: Any) -> str:
@@ -43,8 +46,13 @@ def reading_summary(data: dict[str, Any]) -> dict[str, Any]:
     return data["reading_coverage_summary"]
 
 
+def reasoning_summary(data: dict[str, Any]) -> dict[str, Any]:
+    return data["reasoning_policy_summary"]
+
+
 def render_markdown(data: dict[str, Any]) -> str:
     reading = reading_summary(data)
+    reasoning = reasoning_summary(data)
     lines: list[str] = []
     lines.append(f"# {data['report_title']}")
     lines.append("")
@@ -109,6 +117,14 @@ def render_markdown(data: dict[str, Any]) -> str:
     lines.append("## 5. Applied Review Rules")
     lines.append("")
     lines.append(data["rules_summary"])
+    lines.append("")
+    lines.append("### Reasoning Policy Check")
+    lines.append("")
+    lines.append(f"- Policy: `{reasoning['policy_name']}`")
+    lines.append(f"- Runtime validation: `{reasoning['validation_status']}`")
+    lines.append(f"- Findings reviewed: `{reasoning['findings_reviewed']}`")
+    lines.append(f"- Findings kept inconclusive: `{reasoning['unknown_finding_count']}`")
+    lines.append(f"- Findings requiring document follow-up: `{reasoning['document_request_count']}`")
     lines.append("")
     lines.append("## 6. Main Findings")
     lines.append("")
@@ -378,6 +394,38 @@ def reading_register_table(data: dict[str, Any]) -> Table:
     return table
 
 
+def reasoning_summary_table(data: dict[str, Any]) -> Table:
+    reasoning = reasoning_summary(data)
+    rows = [
+        ["Reasoning metric", "Value"],
+        ["Policy", reasoning["policy_name"]],
+        ["Runtime validation", reasoning["validation_status"]],
+        ["Findings reviewed", str(reasoning["findings_reviewed"])],
+        ["Findings kept inconclusive", str(reasoning["unknown_finding_count"])],
+        ["Findings requiring follow-up", str(reasoning["document_request_count"])],
+    ]
+    table = Table(rows, colWidths=[54 * mm, 112 * mm], repeatRows=1)
+    table.setStyle(
+        TableStyle(
+            [
+                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#0f172a")),
+                ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                ("FONTNAME", (0, 1), (-1, -1), "Helvetica"),
+                ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#f8fafc")]),
+                ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#cbd5e1")),
+                ("FONTSIZE", (0, 0), (-1, -1), 8.2),
+                ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                ("LEFTPADDING", (0, 0), (-1, -1), 5),
+                ("RIGHTPADDING", (0, 0), (-1, -1), 5),
+                ("TOPPADDING", (0, 0), (-1, -1), 4),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+            ]
+        )
+    )
+    return table
+
+
 def bullet_paragraphs(items: list[str], style: ParagraphStyle) -> list[Paragraph]:
     return [Paragraph(f"- {safe(item)}", style) for item in items]
 
@@ -552,6 +600,9 @@ def render_pdf(data: dict[str, Any]) -> None:
         Spacer(1, 8),
         Paragraph("Applied review rules", styles["SectionHeading"]),
         Paragraph(safe(data["rules_summary"]), styles["Body"]),
+        Spacer(1, 6),
+        Paragraph("Reasoning policy check", styles["SubHeading"]),
+        reasoning_summary_table(data),
         Spacer(1, 6),
         Paragraph("Severity scale", styles["SubHeading"]),
         label_value_table(
