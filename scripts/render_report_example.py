@@ -29,6 +29,7 @@ from client_language import (
     client_label_for_severity,
     translate_client_text,
 )
+from client_output_validator import validate_client_markdown
 from reasoning_policy import apply_reasoning_policy
 
 
@@ -664,7 +665,9 @@ def render_pdf(data: dict[str, Any]) -> None:
 
 def main() -> None:
     data = load_data()
-    OUTPUT_MD.write_text(render_markdown(data), encoding="utf-8")
+    markdown = render_markdown(data)
+    validate_client_markdown(markdown)
+    OUTPUT_MD.write_text(markdown, encoding="utf-8")
     render_pdf(data)
     print(OUTPUT_MD)
     print(OUTPUT_PDF)

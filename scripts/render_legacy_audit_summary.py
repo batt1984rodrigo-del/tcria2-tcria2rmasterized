@@ -12,6 +12,7 @@ from client_language import (
     summarize_document_for_client,
     translate_client_text,
 )
+from client_output_validator import validate_client_markdown
 from reasoning_policy import build_legacy_reasoning_summary
 
 
@@ -444,10 +445,12 @@ def main() -> None:
 
     payload = load_payload(args.input.expanduser().resolve())
     report = build_report(payload)
+    markdown = render_markdown(report)
+    validate_client_markdown(markdown)
 
     output_path = args.output.expanduser().resolve()
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(render_markdown(report), encoding="utf-8")
+    output_path.write_text(markdown, encoding="utf-8")
     print(output_path)
 
 

@@ -15,6 +15,7 @@ from client_language import (
     client_reasons_list,
     translate_client_text,
 )
+from client_output_validator import validate_client_markdown
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -131,7 +132,9 @@ def main() -> None:
     payload = load_payload(input_path)
     output_path = (args.output.expanduser().resolve() if args.output else default_output_path(input_path))
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(render_markdown(payload), encoding="utf-8")
+    markdown = render_markdown(payload)
+    validate_client_markdown(markdown)
+    output_path.write_text(markdown, encoding="utf-8")
     print(output_path)
 
 
