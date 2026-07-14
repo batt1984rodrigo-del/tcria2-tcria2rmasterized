@@ -1,18 +1,115 @@
 # TCRIA
 
-Compliance review for company document batches with structured, client-facing reports.
+**Document compliance review that turns evidence into a clear, auditable decision recommendation.**
 
-TCRIA is a document batch compliance review system.
+TCRIA receives a bounded batch of company documents, reads and organizes the available evidence, identifies compliance risks and produces a structured report showing:
 
-Its current task is simple and specific: receive a bounded batch of company documents and return a structured compliance review report with findings, evidence references, limits, and next review priorities.
+- what was confirmed;
+- what is missing or inconsistent;
+- which risks require attention;
+- which evidence supports each finding;
+- what decision is recommended;
+- what must still be validated by a responsible professional.
 
-The repository should describe TCRIA as a software product with one primary workflow, clear inputs, clear processing stages, one main deliverable, and explicit limits.
+> TCRIA does not replace legal, compliance, audit or management authority. It supports the responsible person with an evidence-linked recommendation and a reviewable decision trail.
+
+## For prospective clients
+
+TCRIA is designed for organizations that need to make a decision from a controlled document batch without losing the connection between the decision and its evidence.
+
+A pilot may be used to review, for example:
+
+- supplier qualification documents;
+- procurement or contracting records;
+- accountability and governance files;
+- policy and procedure evidence;
+- internal control documentation;
+- a bounded set of contracts, certificates or declarations.
+
+### What the client provides
+
+One clearly defined document batch, together with the decision or review question.
+
+Example question:
+
+> Based on the submitted documents, should this supplier be approved, approved with conditions, or held for further review?
+
+### What TCRIA returns
+
+One client-facing compliance review report containing:
+
+1. scope and documents reviewed;
+2. reading quality and OCR provenance;
+3. confirmed facts;
+4. missing, expired or inconsistent evidence;
+5. findings linked to document references;
+6. risk and conformity assessment;
+7. recommended decision;
+8. conditions, limits and required human validation;
+9. next review priorities.
+
+## How TCRIA shows what decision to take
+
+TCRIA does not produce an unexplained answer. It builds a decision path.
+
+```text
+Submitted documents
+        ↓
+Validation and document inventory
+        ↓
+Direct extraction and OCR fallback
+        ↓
+Facts, gaps and inconsistencies
+        ↓
+Compliance findings linked to evidence
+        ↓
+Decision recommendation with conditions
+        ↓
+Human review and final institutional decision
+```
+
+A recommendation may be expressed as:
+
+- **PROCEED** — available evidence supports continuation;
+- **PROCEED WITH CONDITIONS** — continuation is possible after stated corrective actions;
+- **HOLD FOR REVIEW** — material evidence is missing, inconsistent or requires responsible review;
+- **DO NOT PROCEED YET** — the submitted batch contains unresolved critical issues.
+
+Each recommendation must explain **why**, identify the supporting evidence and state its limitations.
+
+## Example client scenario
+
+**Review question:** Should a supplier be approved based on the submitted qualification batch?
+
+**Illustrative result:**
+
+> **Recommended decision: PROCEED WITH CONDITIONS**
+>
+> The submitted batch supports preliminary supplier qualification, but the tax clearance certificate is expired and the beneficial ownership declaration was not found. Approval should remain conditional until updated evidence is submitted and validated.
+
+**Evidence trail:**
+
+- corporate registration: found and readable;
+- insurance certificate: valid at the review date;
+- tax clearance certificate: found, but expired;
+- beneficial ownership declaration: not found in the submitted batch;
+- OCR limitation: one scanned page has low confidence and requires visual confirmation.
+
+This example is illustrative and does not represent a legal or institutional decision.
+
+## Client pilot
+
+The recommended next step is a controlled pilot using fictional, sanitized or contractually authorized documents.
+
+See:
+
+- [Client Pilot Guide](docs/client-pilot.md)
+- [Example Decision Recommendation](examples/client-decision-example.md)
+- [Example PDF Report](output/pdf/tcria-compliance-report-example.pdf)
 
 ## Report Preview
 
 Example client-facing output:
-
-[Example PDF report](output/pdf/tcria-compliance-report-example.pdf)
 
 ![Compliance report preview - page 1](docs/images/tcria-compliance-report-example-1.png)
 
@@ -26,29 +123,28 @@ TCRIA exists to do one main job:
 - extract relevant content and signals;
 - identify compliance and conformity issues;
 - organize findings and evidence;
-- generate a structured compliance review report.
+- generate a structured compliance review report with a decision recommendation.
 
 ## Primary Input
 
 The primary input is:
 
-- one bounded document batch submitted for review.
+- one bounded document batch submitted for review;
+- one defined review or decision question.
 
-The batch may come from a folder, upload, or workspace, but that packaging detail does not define a different product.
+The batch may come from a folder, upload or workspace, but that packaging detail does not define a different product.
 
 ## Primary Output
 
-The primary output is:
-
-- one structured compliance review report.
-
-That report must contain:
+The primary output is one structured compliance review report containing:
 
 - formatted client-facing presentation;
 - scope summary;
 - compliance findings;
 - evidence references;
 - conformity gaps or unresolved points;
+- recommended decision and rationale;
+- conditions and escalation points;
 - unresolved items or limits;
 - next review priorities.
 
@@ -58,13 +154,15 @@ The current repository foundation assumes:
 
 1. the user submits a bounded document batch for review;
 2. the system analyzes documents, not an entire company or environment;
-3. the system produces a report, not a final institutional decision;
+3. the system recommends a decision, but does not issue the final institutional, legal or management decision;
 4. document reading and risk judgment are separate steps;
 5. imperfect documents are flagged, not automatically discarded;
-6. the MVP is centered on one compliance review workflow, not multiple products.
+6. every material recommendation should be linked to evidence or explicitly marked as unresolved;
+7. the MVP is centered on one compliance review workflow, not multiple products.
 
 ## Documentation Map
 
+- [Client Pilot Guide](docs/client-pilot.md)
 - [Repository Scope](docs/repository-constitution.md)
 - [Naming Boundaries](docs/naming-boundaries.md)
 - [Product Definition](docs/product-vision.md)
@@ -87,10 +185,12 @@ The current repository foundation assumes:
 The current work in this repository is to define TCRIA objectively as a product:
 
 - what document batch enters the system;
+- which decision question is being reviewed;
 - how the batch is processed;
 - how direct extraction and OCR fallback are exposed to the user;
+- how facts, gaps and risks are separated;
+- how a recommended decision is justified by evidence;
 - what the compliance review report must contain;
-- how the report must be formatted for immediate client understanding;
 - how imperfect material is handled;
-- which components are required for this one workflow;
+- what requires human validation;
 - what remains outside the MVP.
