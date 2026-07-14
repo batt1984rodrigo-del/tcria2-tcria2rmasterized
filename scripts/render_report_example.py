@@ -19,6 +19,16 @@ from reportlab.platypus import (
     TableStyle,
 )
 
+from client_language import (
+    client_label_for_compliance_area,
+    client_label_for_confidence,
+    client_label_for_conformity,
+    client_label_for_ocr_status,
+    client_label_for_overall_status,
+    client_label_for_reading_method,
+    client_label_for_severity,
+    translate_client_text,
+)
 from reasoning_policy import apply_reasoning_policy
 
 
@@ -50,137 +60,145 @@ def reasoning_summary(data: dict[str, Any]) -> dict[str, Any]:
     return data["reasoning_policy_summary"]
 
 
+def client_text(value: Any) -> str:
+    return translate_client_text(value)
+
+
+def client_list(values: list[str]) -> list[str]:
+    return [client_text(value) for value in values]
+
+
 def render_markdown(data: dict[str, Any]) -> str:
     reading = reading_summary(data)
     reasoning = reasoning_summary(data)
     lines: list[str] = []
-    lines.append(f"# {data['report_title']}")
+    lines.append(f"# {client_text(data['report_title'])}")
     lines.append("")
-    lines.append("## 1. Report Identification")
+    lines.append("## 1. Identificacao do relatorio")
     lines.append("")
-    lines.append(f"- Company: `{data['company_name']}`")
-    lines.append(f"- Review batch: `{data['batch_name']}`")
-    lines.append(f"- Report id: `{data['report_id']}`")
-    lines.append(f"- Generated at: `{data['generated_at']}`")
-    lines.append(f"- Review rules: `{data['rule_set_name']}`")
+    lines.append(f"- Empresa: `{data['company_name']}`")
+    lines.append(f"- Lote analisado: `{data['batch_name']}`")
+    lines.append(f"- Id do relatorio: `{data['report_id']}`")
+    lines.append(f"- Gerado em: `{data['generated_at']}`")
+    lines.append(f"- Regras aplicadas: `{client_text(data['rule_set_name'])}`")
     lines.append("")
-    lines.append("## 2. Executive Summary")
+    lines.append("## 2. O que precisa ser visto primeiro")
     lines.append("")
-    lines.append(data["overall_conclusion"])
+    lines.append(client_text(data["overall_conclusion"]))
     lines.append("")
-    lines.append("### Immediate Priorities")
+    lines.append("### Proximos passos imediatos")
     lines.append("")
-    for idx, item in enumerate(data["immediate_priorities"], start=1):
+    for idx, item in enumerate(client_list(data["immediate_priorities"]), start=1):
         lines.append(f"{idx}. {item}")
     lines.append("")
-    lines.append("### Snapshot")
+    lines.append("### Resumo rapido")
     lines.append("")
-    lines.append(f"- Documents reviewed: `{data['documents_reviewed']}`")
-    lines.append(f"- Critical findings: `{data['critical_count']}`")
-    lines.append(f"- Relevant findings: `{data['relevant_count']}`")
-    lines.append(f"- Informational findings: `{data['informational_count']}`")
-    lines.append(f"- Overall compliance status: `{data['overall_status']}`")
+    lines.append(f"- Documentos revisados: `{data['documents_reviewed']}`")
+    lines.append(f"- Achados criticos: `{data['critical_count']}`")
+    lines.append(f"- Achados relevantes: `{data['relevant_count']}`")
+    lines.append(f"- Achados informativos: `{data['informational_count']}`")
+    lines.append(f"- Situacao geral: `{client_label_for_overall_status(data['overall_status'])}`")
     lines.append("")
-    lines.append("## 3. Analysis Scope")
+    lines.append("## 3. Escopo da analise")
     lines.append("")
-    lines.append(data["scope_description"])
+    lines.append(client_text(data["scope_description"]))
     lines.append("")
-    lines.append(f"- Source: `{data['source_description']}`")
-    lines.append(f"- Document types: `{data['document_types']}`")
-    lines.append(f"- Business area: `{data['business_area']}`")
-    lines.append(f"- Period covered: `{data['period_covered']}`")
+    lines.append(f"- Origem: `{client_text(data['source_description'])}`")
+    lines.append(f"- Tipos de documento: `{client_text(data['document_types'])}`")
+    lines.append(f"- Area de negocio: `{client_text(data['business_area'])}`")
+    lines.append(f"- Periodo coberto: `{data['period_covered']}`")
     lines.append("")
-    lines.append("### What Was Checked")
+    lines.append("### O que foi verificado")
     lines.append("")
-    lines.append(bullet_lines(data["checks"]))
+    lines.append(bullet_lines(client_list(data["checks"])))
     lines.append("")
-    lines.append("## 4. Reading Coverage And Extraction Provenance")
+    lines.append("## 4. Leitura dos documentos e confianca da leitura")
     lines.append("")
-    lines.append("### Reading Snapshot")
+    lines.append("### Resumo da leitura")
     lines.append("")
-    lines.append(f"- Documents with direct text extraction: `{reading['direct_text_documents']}`")
-    lines.append(f"- Documents read through OCR fallback: `{reading['ocr_text_documents']}`")
-    lines.append(f"- Documents where OCR failed: `{reading['ocr_failed_documents']}`")
-    lines.append(f"- Reading confidence rule: `{reading['reading_confidence_rule']}`")
+    lines.append(f"- Documentos lidos com texto direto: `{reading['direct_text_documents']}`")
+    lines.append(f"- Documentos que dependeram de OCR: `{reading['ocr_text_documents']}`")
+    lines.append(f"- Documentos em que o OCR falhou: `{reading['ocr_failed_documents']}`")
+    lines.append(f"- Regra de confianca da leitura: `{client_text(reading['reading_confidence_rule'])}`")
     lines.append("")
-    lines.append("### Reading Register")
+    lines.append("### Documento por documento")
     lines.append("")
-    lines.append("| Document | Read method | OCR status | Reading confidence | Notes |")
+    lines.append("| Documento | Metodo de leitura | Situacao do OCR | Confianca da leitura | Observacao |")
     lines.append("| --- | --- | --- | --- | --- |")
     for item in data["reading_register"]:
         lines.append(
-            f"| {item['document']} | {item['read_method']} | {item['ocr_status']} | {item['reading_confidence']} | {item['notes']} |"
+            f"| {item['document']} | {client_label_for_reading_method(item['read_method'])} | {client_label_for_ocr_status(item['ocr_status'])} | {client_label_for_confidence(item['reading_confidence'])} | {client_text(item['notes'])} |"
         )
     lines.append("")
-    lines.append("The report does not hide which reading method was used for the reviewed material.")
+    lines.append("O relatorio nao esconde como cada documento foi lido.")
     lines.append("")
-    lines.append("## 5. Applied Review Rules")
+    lines.append("## 5. Regras e disciplina da analise")
     lines.append("")
-    lines.append(data["rules_summary"])
+    lines.append(client_text(data["rules_summary"]))
     lines.append("")
-    lines.append("### Reasoning Policy Check")
+    lines.append("### Checagem interna de coerencia")
     lines.append("")
-    lines.append(f"- Policy: `{reasoning['policy_name']}`")
-    lines.append(f"- Runtime validation: `{reasoning['validation_status']}`")
-    lines.append(f"- Findings reviewed: `{reasoning['findings_reviewed']}`")
-    lines.append(f"- Findings kept inconclusive: `{reasoning['unknown_finding_count']}`")
-    lines.append(f"- Findings requiring document follow-up: `{reasoning['document_request_count']}`")
+    lines.append(f"- Policy aplicada: `{reasoning['policy_name']}`")
+    lines.append(f"- Validacao em runtime: `{client_text(reasoning['validation_status'])}`")
+    lines.append(f"- Achados revisados: `{reasoning['findings_reviewed']}`")
+    lines.append(f"- Pontos mantidos como inconclusivos: `{reasoning['unknown_finding_count']}`")
+    lines.append(f"- Pontos que pedem mais documentos: `{reasoning['document_request_count']}`")
     lines.append("")
-    lines.append("## 6. Main Findings")
+    lines.append("## 6. Principais pontos do lote")
     lines.append("")
     for item in data["findings"]:
-        lines.append(f"### {item['finding_id']} - {item['title']}")
+        lines.append(f"### {item['finding_id']} - {client_text(item['title'])}")
         lines.append("")
-        lines.append(f"- Compliance area: `{item['compliance_area']}`")
-        lines.append(f"- Severity: `{item['severity']}`")
-        lines.append(f"- Conformity status: `{item['conformity_status']}`")
-        lines.append(f"- Confidence: `{item['confidence']}`")
+        lines.append(f"- Area analisada: `{client_label_for_compliance_area(item['compliance_area'])}`")
+        lines.append(f"- Gravidade: `{client_label_for_severity(item['severity'])}`")
+        lines.append(f"- Situacao: `{client_label_for_conformity(item['conformity_status'])}`")
+        lines.append(f"- Quanto confiamos nesta leitura: `{client_label_for_confidence(item['confidence'])}`")
         lines.append("")
-        lines.append("#### What Was Identified")
+        lines.append("#### O que foi encontrado")
         lines.append("")
-        lines.append(item["what_identified"])
+        lines.append(client_text(item["what_identified"]))
         lines.append("")
-        lines.append("#### Why It Matters")
+        lines.append("#### Por que isso importa")
         lines.append("")
-        lines.append(item["why_matters"])
+        lines.append(client_text(item["why_matters"]))
         lines.append("")
-        lines.append("#### Supporting Evidence")
+        lines.append("#### Quais provas sustentam esse ponto")
         lines.append("")
-        for evidence in item["supporting_evidence"]:
+        for evidence in client_list(item["supporting_evidence"]):
             lines.append(f"- {evidence}")
         lines.append("")
-        lines.append("#### Recommended Follow-Up")
+        lines.append("#### O que fazer agora")
         lines.append("")
-        for follow_up in item["follow_up"]:
+        for follow_up in client_list(item["follow_up"]):
             lines.append(f"- {follow_up}")
         lines.append("")
-    lines.append("## 7. Evidence Reference Register")
+    lines.append("## 7. Registro de provas")
     lines.append("")
-    lines.append("| Evidence id | Document | Reference | Why it matters |")
+    lines.append("| Id da prova | Documento | Referencia | Por que isso importa |")
     lines.append("| --- | --- | --- | --- |")
     for item in data["evidence_register"]:
         lines.append(
-            f"| {item['evidence_id']} | {item['document']} | {item['reference']} | {item['why_it_matters']} |"
+            f"| {item['evidence_id']} | {item['document']} | {client_text(item['reference'])} | {client_text(item['why_it_matters'])} |"
         )
     lines.append("")
-    lines.append("## 8. Unresolved Points And Limitations")
+    lines.append("## 8. O que ainda nao foi fechado")
     lines.append("")
-    lines.append("### Unresolved Points")
+    lines.append("### Pontos ainda em aberto")
     lines.append("")
-    lines.append(bullet_lines(data["unresolved_points"]))
+    lines.append(bullet_lines(client_list(data["unresolved_points"])))
     lines.append("")
-    lines.append("### Analysis Limits")
+    lines.append("### Limites desta analise")
     lines.append("")
-    lines.append(bullet_lines(data["limits"]))
+    lines.append(bullet_lines(client_list(data["limits"])))
     lines.append("")
-    lines.append("## 9. Next Review Priorities")
+    lines.append("## 9. Prioridades da proxima revisao")
     lines.append("")
-    for idx, item in enumerate(data["next_priorities"], start=1):
+    for idx, item in enumerate(client_list(data["next_priorities"]), start=1):
         lines.append(f"{idx}. {item}")
     lines.append("")
-    lines.append("## 10. Annexes")
+    lines.append("## 10. Anexos")
     lines.append("")
-    lines.append(bullet_lines(data["annexes"]))
+    lines.append(bullet_lines(client_list(data["annexes"])))
     lines.append("")
     return "\n".join(lines)
 
@@ -301,12 +319,12 @@ def label_value_table(rows: list[list[str]], col_widths: list[float]) -> Table:
 
 def issue_summary_table(data: dict[str, Any]) -> Table:
     rows = [
-        ["Metric", "Value"],
-        ["Documents reviewed", str(data["documents_reviewed"])],
-        ["Critical findings", str(data["critical_count"])],
-        ["Relevant findings", str(data["relevant_count"])],
-        ["Informational findings", str(data["informational_count"])],
-        ["Overall status", data["overall_status"]],
+        ["Metrica", "Valor"],
+        ["Documentos revisados", str(data["documents_reviewed"])],
+        ["Achados criticos", str(data["critical_count"])],
+        ["Achados relevantes", str(data["relevant_count"])],
+        ["Achados informativos", str(data["informational_count"])],
+        ["Situacao geral", client_label_for_overall_status(data["overall_status"])],
     ]
     table = Table(rows, colWidths=[58 * mm, 42 * mm], repeatRows=1)
     style = TableStyle(
@@ -332,11 +350,11 @@ def issue_summary_table(data: dict[str, Any]) -> Table:
 def reading_summary_table(data: dict[str, Any]) -> Table:
     reading = reading_summary(data)
     rows = [
-        ["Reading metric", "Value"],
-        ["Direct text extraction", str(reading["direct_text_documents"])],
-        ["OCR fallback success", str(reading["ocr_text_documents"])],
-        ["OCR failed", str(reading["ocr_failed_documents"])],
-        ["Confidence rule", reading["reading_confidence_rule"]],
+        ["Metrica de leitura", "Valor"],
+        ["Leitura direta do texto", str(reading["direct_text_documents"])],
+        ["OCR com recuperacao util", str(reading["ocr_text_documents"])],
+        ["OCR sem recuperacao suficiente", str(reading["ocr_failed_documents"])],
+        ["Regra de confianca", client_text(reading["reading_confidence_rule"])],
     ]
     table = Table(rows, colWidths=[54 * mm, 112 * mm], repeatRows=1)
     table.setStyle(
@@ -361,15 +379,15 @@ def reading_summary_table(data: dict[str, Any]) -> Table:
 
 
 def reading_register_table(data: dict[str, Any]) -> Table:
-    rows = [["Document", "Read method", "OCR status", "Confidence", "Notes"]]
+    rows = [["Documento", "Metodo de leitura", "Situacao do OCR", "Confianca", "Observacao"]]
     for item in data["reading_register"]:
         rows.append(
             [
                 item["document"],
-                item["read_method"],
-                item["ocr_status"],
-                item["reading_confidence"],
-                item["notes"],
+                client_label_for_reading_method(item["read_method"]),
+                client_label_for_ocr_status(item["ocr_status"]),
+                client_label_for_confidence(item["reading_confidence"]),
+                client_text(item["notes"]),
             ]
         )
     table = Table(rows, colWidths=[46 * mm, 24 * mm, 30 * mm, 22 * mm, 44 * mm], repeatRows=1)
@@ -397,12 +415,12 @@ def reading_register_table(data: dict[str, Any]) -> Table:
 def reasoning_summary_table(data: dict[str, Any]) -> Table:
     reasoning = reasoning_summary(data)
     rows = [
-        ["Reasoning metric", "Value"],
+        ["Metrica de coerencia", "Valor"],
         ["Policy", reasoning["policy_name"]],
-        ["Runtime validation", reasoning["validation_status"]],
-        ["Findings reviewed", str(reasoning["findings_reviewed"])],
-        ["Findings kept inconclusive", str(reasoning["unknown_finding_count"])],
-        ["Findings requiring follow-up", str(reasoning["document_request_count"])],
+        ["Validacao em runtime", client_text(reasoning["validation_status"])],
+        ["Achados revisados", str(reasoning["findings_reviewed"])],
+        ["Pontos inconclusivos", str(reasoning["unknown_finding_count"])],
+        ["Pontos que pedem documentos", str(reasoning["document_request_count"])],
     ]
     table = Table(rows, colWidths=[54 * mm, 112 * mm], repeatRows=1)
     table.setStyle(
@@ -432,7 +450,7 @@ def bullet_paragraphs(items: list[str], style: ParagraphStyle) -> list[Paragraph
 
 def finding_block(item: dict[str, Any], styles) -> KeepTogether:
     badge = Table(
-        [[item["severity"], item["conformity_status"], item["confidence"]]],
+        [[client_label_for_severity(item["severity"]), client_label_for_conformity(item["conformity_status"]), client_label_for_confidence(item["confidence"])]],
         colWidths=[30 * mm, 42 * mm, 28 * mm],
     )
     badge.setStyle(
@@ -456,45 +474,45 @@ def finding_block(item: dict[str, Any], styles) -> KeepTogether:
 
     meta = label_value_table(
         [
-            ["Compliance area", item["compliance_area"]],
-            ["Severity", item["severity"]],
-            ["Conformity status", item["conformity_status"]],
-            ["Confidence", item["confidence"]],
+            ["Area analisada", client_label_for_compliance_area(item["compliance_area"])],
+            ["Gravidade", client_label_for_severity(item["severity"])],
+            ["Situacao", client_label_for_conformity(item["conformity_status"])],
+            ["Confianca", client_label_for_confidence(item["confidence"])],
         ],
         [36 * mm, 124 * mm],
     )
 
     block = [
         Spacer(1, 6),
-        Paragraph(f"{safe(item['finding_id'])} - {safe(item['title'])}", styles["FindingTitle"]),
+        Paragraph(f"{safe(item['finding_id'])} - {safe(client_text(item['title']))}", styles["FindingTitle"]),
         badge,
         Spacer(1, 4),
         meta,
         Spacer(1, 5),
-        Paragraph("<b>What was identified</b>", styles["SubHeading"]),
-        Paragraph(safe(item["what_identified"]), styles["Body"]),
+        Paragraph("<b>O que foi encontrado</b>", styles["SubHeading"]),
+        Paragraph(safe(client_text(item["what_identified"])), styles["Body"]),
         Spacer(1, 3),
-        Paragraph("<b>Why it matters</b>", styles["SubHeading"]),
-        Paragraph(safe(item["why_matters"]), styles["Body"]),
+        Paragraph("<b>Por que isso importa</b>", styles["SubHeading"]),
+        Paragraph(safe(client_text(item["why_matters"])), styles["Body"]),
         Spacer(1, 3),
-        Paragraph("<b>Supporting evidence</b>", styles["SubHeading"]),
-        *bullet_paragraphs(item["supporting_evidence"], styles["Body"]),
+        Paragraph("<b>Quais provas sustentam esse ponto</b>", styles["SubHeading"]),
+        *bullet_paragraphs(client_list(item["supporting_evidence"]), styles["Body"]),
         Spacer(1, 3),
-        Paragraph("<b>Recommended follow-up</b>", styles["SubHeading"]),
-        *bullet_paragraphs(item["follow_up"], styles["Body"]),
+        Paragraph("<b>O que fazer agora</b>", styles["SubHeading"]),
+        *bullet_paragraphs(client_list(item["follow_up"]), styles["Body"]),
     ]
     return KeepTogether(block)
 
 
 def evidence_table(data: dict[str, Any]) -> Table:
-    rows = [["Evidence id", "Document", "Reference", "Why it matters"]]
+    rows = [["Id da prova", "Documento", "Referencia", "Por que isso importa"]]
     for item in data["evidence_register"]:
         rows.append(
             [
                 item["evidence_id"],
                 item["document"],
-                item["reference"],
-                item["why_it_matters"],
+                client_text(item["reference"]),
+                client_text(item["why_it_matters"]),
             ]
         )
     table = Table(rows, colWidths=[22 * mm, 52 * mm, 28 * mm, 76 * mm], repeatRows=1)
@@ -527,10 +545,10 @@ def add_page_chrome(canvas_obj, doc):
     canvas_obj.line(doc.leftMargin, 14 * mm, doc.pagesize[0] - doc.rightMargin, 14 * mm)
     canvas_obj.setFont("Helvetica-Bold", 8)
     canvas_obj.setFillColor(colors.HexColor("#0f172a"))
-    canvas_obj.drawString(doc.leftMargin, doc.pagesize[1] - 14 * mm, "TCRIA Compliance Review Report")
+    canvas_obj.drawString(doc.leftMargin, doc.pagesize[1] - 14 * mm, "TCRIA - resumo documental para primeira leitura")
     canvas_obj.setFont("Helvetica", 8)
     canvas_obj.setFillColor(colors.HexColor("#475569"))
-    canvas_obj.drawString(doc.leftMargin, 8 * mm, "Client-facing output template")
+    canvas_obj.drawString(doc.leftMargin, 8 * mm, "Saida orientada ao cliente")
     canvas_obj.drawRightString(doc.pagesize[0] - doc.rightMargin, 8 * mm, f"Page {canvas_obj.getPageNumber()}")
     canvas_obj.restoreState()
 
@@ -545,77 +563,77 @@ def render_pdf(data: dict[str, Any]) -> None:
         rightMargin=16 * mm,
         topMargin=24 * mm,
         bottomMargin=18 * mm,
-        title=data["report_title"],
+        title=client_text(data["report_title"]),
         author="OpenAI Codex",
     )
 
     story = [
-        Paragraph(safe(data["report_title"]), styles["ReportTitle"]),
-        Paragraph(safe(data["overall_conclusion"]), styles["Body"]),
+        Paragraph(safe(client_text(data["report_title"])), styles["ReportTitle"]),
+        Paragraph(safe(client_text(data["overall_conclusion"])), styles["Body"]),
         Spacer(1, 8),
         label_value_table(
             [
-                ["Company", data["company_name"]],
-                ["Review batch", data["batch_name"]],
-                ["Report id", data["report_id"]],
-                ["Generated at", data["generated_at"]],
-                ["Review rules", data["rule_set_name"]],
-                ["Business area", data["business_area"]],
+                ["Empresa", data["company_name"]],
+                ["Lote analisado", data["batch_name"]],
+                ["Id do relatorio", data["report_id"]],
+                ["Gerado em", data["generated_at"]],
+                ["Regras aplicadas", client_text(data["rule_set_name"])],
+                ["Area de negocio", client_text(data["business_area"])],
             ],
             [36 * mm, 132 * mm],
         ),
         Spacer(1, 8),
-        Paragraph("Executive summary", styles["SectionHeading"]),
+        Paragraph("O que precisa ser visto primeiro", styles["SectionHeading"]),
         issue_summary_table(data),
         Spacer(1, 8),
-        Paragraph("Immediate priorities", styles["SubHeading"]),
-        *bullet_paragraphs(data["immediate_priorities"], styles["Body"]),
+        Paragraph("Proximos passos imediatos", styles["SubHeading"]),
+        *bullet_paragraphs(client_list(data["immediate_priorities"]), styles["Body"]),
         Spacer(1, 8),
-        Paragraph("Analysis scope", styles["SectionHeading"]),
-        Paragraph(safe(data["scope_description"]), styles["Body"]),
+        Paragraph("Escopo da analise", styles["SectionHeading"]),
+        Paragraph(safe(client_text(data["scope_description"])), styles["Body"]),
         Spacer(1, 4),
         label_value_table(
             [
-                ["Source", data["source_description"]],
-                ["Document types", data["document_types"]],
-                ["Business area", data["business_area"]],
-                ["Period covered", data["period_covered"]],
+                ["Origem", client_text(data["source_description"])],
+                ["Tipos de documento", client_text(data["document_types"])],
+                ["Area de negocio", client_text(data["business_area"])],
+                ["Periodo coberto", data["period_covered"]],
             ],
             [36 * mm, 132 * mm],
         ),
         Spacer(1, 6),
-        Paragraph("What was checked", styles["SubHeading"]),
-        *bullet_paragraphs(data["checks"], styles["Body"]),
+        Paragraph("O que foi verificado", styles["SubHeading"]),
+        *bullet_paragraphs(client_list(data["checks"]), styles["Body"]),
         Spacer(1, 8),
-        Paragraph("Reading coverage and extraction provenance", styles["SectionHeading"]),
+        Paragraph("Leitura dos documentos e confianca da leitura", styles["SectionHeading"]),
         reading_summary_table(data),
         Spacer(1, 6),
-        Paragraph("Reading register", styles["SubHeading"]),
+        Paragraph("Documento por documento", styles["SubHeading"]),
         reading_register_table(data),
         Spacer(1, 6),
         Paragraph(
-            "The report does not hide which reading method was used for the reviewed material.",
+            "O relatorio nao esconde como cada documento foi lido.",
             styles["Small"],
         ),
         Spacer(1, 8),
-        Paragraph("Applied review rules", styles["SectionHeading"]),
-        Paragraph(safe(data["rules_summary"]), styles["Body"]),
+        Paragraph("Regras e disciplina da analise", styles["SectionHeading"]),
+        Paragraph(safe(client_text(data["rules_summary"])), styles["Body"]),
         Spacer(1, 6),
-        Paragraph("Reasoning policy check", styles["SubHeading"]),
+        Paragraph("Checagem interna de coerencia", styles["SubHeading"]),
         reasoning_summary_table(data),
         Spacer(1, 6),
-        Paragraph("Severity scale", styles["SubHeading"]),
+        Paragraph("Como ler a gravidade dos pontos", styles["SubHeading"]),
         label_value_table(
             [
-                ["Critical", data["severity_scale"]["critical"]],
-                ["Relevant", data["severity_scale"]["relevant"]],
-                ["Attention", data["severity_scale"]["attention"]],
-                ["Informational", data["severity_scale"]["informational"]],
+                ["Critico", client_text(data["severity_scale"]["critical"])],
+                ["Relevante", client_text(data["severity_scale"]["relevant"])],
+                ["Atencao", client_text(data["severity_scale"]["attention"])],
+                ["Informativo", client_text(data["severity_scale"]["informational"])],
             ],
             [28 * mm, 140 * mm],
         ),
         PageBreak(),
-        Paragraph("Main findings", styles["SectionHeading"]),
+        Paragraph("Principais pontos do lote", styles["SectionHeading"]),
     ]
 
     for item in data["findings"]:
@@ -624,20 +642,20 @@ def render_pdf(data: dict[str, Any]) -> None:
     story.extend(
         [
             PageBreak(),
-            Paragraph("Evidence reference register", styles["SectionHeading"]),
+            Paragraph("Registro de provas", styles["SectionHeading"]),
             evidence_table(data),
             Spacer(1, 8),
-            Paragraph("Unresolved points", styles["SectionHeading"]),
-            *bullet_paragraphs(data["unresolved_points"], styles["Body"]),
+            Paragraph("Pontos ainda em aberto", styles["SectionHeading"]),
+            *bullet_paragraphs(client_list(data["unresolved_points"]), styles["Body"]),
             Spacer(1, 8),
-            Paragraph("Analysis limits", styles["SectionHeading"]),
-            *bullet_paragraphs(data["limits"], styles["Body"]),
+            Paragraph("Limites desta analise", styles["SectionHeading"]),
+            *bullet_paragraphs(client_list(data["limits"]), styles["Body"]),
             Spacer(1, 8),
-            Paragraph("Next review priorities", styles["SectionHeading"]),
-            *bullet_paragraphs(data["next_priorities"], styles["Body"]),
+            Paragraph("Prioridades da proxima revisao", styles["SectionHeading"]),
+            *bullet_paragraphs(client_list(data["next_priorities"]), styles["Body"]),
             Spacer(1, 8),
-            Paragraph("Annexes", styles["SectionHeading"]),
-            *bullet_paragraphs(data["annexes"], styles["Body"]),
+            Paragraph("Anexos", styles["SectionHeading"]),
+            *bullet_paragraphs(client_list(data["annexes"]), styles["Body"]),
         ]
     )
 

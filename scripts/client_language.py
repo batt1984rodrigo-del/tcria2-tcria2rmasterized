@@ -67,6 +67,12 @@ SEVERITY_LABELS = {
     "Informational": "Informativo",
 }
 
+COMPLIANCE_AREA_LABELS = {
+    "Approval Governance": "Governanca de aprovacoes",
+    "Third-Party Compliance": "Conformidade de terceiros",
+    "Exception Management": "Gestao de excecoes",
+}
+
 CONFORMITY_LABELS = {
     "Noncompliant": "Nao conforme",
     "Partially Compliant": "Parcialmente conforme",
@@ -102,6 +108,73 @@ TEXT_REPLACEMENTS = {
     "Current material does not support a stronger conclusion.": "O material atual ainda nao sustenta uma conclusao mais forte.",
     "Current material supports a bounded technical summary.": "O material atual permite apenas um resumo tecnico delimitado.",
     "Complementary analysis only. Official gate outcomes are preserved.": "Analise complementar apenas. Os resultados oficiais permanecem inalterados.",
+    "passed": "aprovada",
+    "Compliance Review Report - Procurement And Vendor Documentation": "Resumo da analise documental de compras e fornecedores",
+    "Corporate Procurement Compliance v1": "Regras de revisao de compras v1",
+    "The reviewed batch shows a documented procurement process, but the current evidence is not sufficient to support a clean compliance conclusion. The main gaps are missing approval trails, incomplete vendor due diligence support, and inconsistent contract exception records.": "O lote analisado mostra um processo de compras documentado, mas as provas atuais ainda nao sustentam uma conclusao limpa de conformidade. As principais pendencias sao aprovacoes sem comprovacao suficiente, diligencia incompleta de fornecedores e registros irregulares de excecao contratual.",
+    "Recover approval evidence for contracts signed above the delegated threshold.": "Recuperar provas de aprovacao para contratos assinados acima do limite de delegacao.",
+    "Complete vendor due diligence support for suppliers marked as strategic.": "Completar a diligencia documental dos fornecedores marcados como estrategicos.",
+    "Regularize exception records linked to emergency procurement requests.": "Regularizar os registros de excecao ligados a compras emergenciais.",
+    "Review of procurement and vendor management documents related to contract approvals, vendor onboarding, and exception handling for the second quarter of 2026.": "Revisao de documentos de compras e gestao de fornecedores ligados a aprovacoes contratuais, cadastro de terceiros e tratamento de excecoes no segundo trimestre de 2026.",
+    "Uploaded batch from procurement shared drive": "Lote enviado a partir da pasta compartilhada da area de compras",
+    "contracts, approval forms, vendor onboarding files, exception memos, email exports": "contratos, formularios de aprovacao, arquivos de cadastro de fornecedores, memorandos de excecao e exportacoes de e-mail",
+    "Procurement and Vendor Management": "Compras e gestao de fornecedores",
+    "approval trail completeness": "completude da trilha de aprovacao",
+    "vendor due diligence support": "diligencia documental de fornecedores",
+    "exception justification records": "registros de justificativa de excecao",
+    "contract conformity against internal thresholds": "aderencia contratual aos limites internos",
+    "Confidence reflects reading quality only and does not replace compliance certainty.": "A confianca de leitura mede apenas a qualidade da leitura do documento e nao substitui a certeza da analise.",
+    "Embedded text was available on all reviewed pages.": "O texto do arquivo ja estava disponivel nas paginas revisadas.",
+    "Direct extraction returned no usable text; OCR recovered most checklist content.": "A extracao direta nao trouxe texto util, mas o OCR recuperou a maior parte do checklist.",
+    "Scan quality remained insufficient after OCR fallback.": "A qualidade da digitalizacao continuou insuficiente mesmo apos o OCR.",
+    "Native tabular text was read directly.": "O conteudo tabular nativo foi lido diretamente.",
+    "The review rules classify findings by evidence completeness, traceability, approval support, and conformity with documented procurement controls.": "As regras desta revisao observam completude das provas, origem das informacoes, suporte de aprovacao e aderencia aos controles documentados de compras.",
+    "Evidence indicates a material compliance gap requiring immediate review.": "Indica uma falha material que pede revisao imediata.",
+    "Evidence indicates a meaningful control weakness or unresolved conformity gap.": "Indica uma fragilidade relevante de controle ou uma lacuna de conformidade ainda aberta.",
+    "Evidence suggests a moderate issue that should be clarified or regularized.": "Indica um ponto moderado que precisa ser esclarecido ou regularizado.",
+    "Evidence indicates a point worth tracking without immediate escalation.": "Indica um ponto que merece acompanhamento sem escalacao imediata.",
+    "Missing approval trail for high-value contract amendments": "Falta comprovacao de aprovacao em aditivos contratuais de alto valor",
+    "Incomplete vendor due diligence support for strategic suppliers": "Diligencia documental incompleta para fornecedores estrategicos",
+    "Incomplete diligencia documental de fornecedores for strategic suppliers": "Diligencia documental incompleta para fornecedores estrategicos",
+    "Emergency procurement exceptions are documented inconsistently": "As excecoes de compras emergenciais estao documentadas de forma inconsistente",
+    "Three contract amendments above the delegated threshold were located without signed approval support in the submitted batch.": "Tres aditivos contratuais acima do limite de delegacao foram encontrados sem comprovacao assinada de aprovacao no lote enviado.",
+    "The absence of approval evidence weakens traceability and creates exposure to unauthorized commercial commitment.": "A falta de comprovacao de aprovacao enfraquece a rastreabilidade e aumenta o risco de compromisso comercial sem autorizacao clara.",
+    "Contract amendment file AM-17 with no approval attachment.": "Arquivo do aditivo contratual AM-17 sem anexo de aprovacao.",
+    "Approval index spreadsheet marks the record as pending.": "A planilha de controle de aprovacoes marca o registro como pendente.",
+    "Email chain references urgency but not final authorization.": "A troca de e-mails menciona urgencia, mas nao mostra autorizacao final.",
+    "Retrieve signed approval records or formal ratification evidence.": "Recuperar os registros assinados de aprovacao ou prova formal de ratificacao.",
+    "Confirm whether the contracts entered execution before approval closure.": "Confirmar se os contratos entraram em execucao antes do fechamento da aprovacao.",
+    "Five strategic supplier files include onboarding forms but do not contain the full due diligence support referenced by the checklist.": "Cinco pastas de fornecedores estrategicos contem formularios de cadastro, mas nao trazem toda a diligencia documental indicada no checklist.",
+    "Incomplete due diligence weakens evidence of onboarding conformity and reduces defensibility of vendor approval decisions.": "A diligencia incompleta enfraquece a prova de conformidade no cadastro e reduz a defensabilidade das aprovacoes de fornecedores.",
+    "Checklist marks tax and sanction review as required.": "O checklist indica revisao fiscal e de sancoes como obrigatoria.",
+    "Three folders contain only summary forms without source documents.": "Tres pastas contem apenas formularios-resumo, sem os documentos de origem.",
+    "Vendor master sheet lists suppliers as approved.": "A planilha mestre de fornecedores lista esses terceiros como aprovados.",
+    "Request the missing due diligence attachments from procurement operations.": "Solicitar os anexos faltantes de diligencia para a equipe de operacoes de compras.",
+    "Confirm whether approval was granted with an exception process.": "Confirmar se a aprovacao foi concedida por processo de excecao.",
+    "Exception memos exist for part of the emergency procurement set, but the rationale and approval pattern are not consistent across documents.": "Existem memorandos de excecao para parte das compras emergenciais, mas a justificativa e o padrao de aprovacao nao sao consistentes entre os documentos.",
+    "Inconsistent exception records make it difficult to determine whether nonstandard procurement steps were justified and approved correctly.": "Registros inconsistentes de excecao dificultam saber se etapas fora do padrao foram justificadas e aprovadas corretamente.",
+    "Two memos use the standard exception form.": "Dois memorandos usam o formulario padrao de excecao.",
+    "One request is supported only by email language.": "Um pedido esta sustentado apenas por linguagem em e-mail.",
+    "No single register consolidates all emergency exceptions.": "Nao existe um registro unico consolidando todas as excecoes emergenciais.",
+    "Create a reconciled list of all emergency exceptions in the batch.": "Criar uma lista reconciliada de todas as excecoes emergenciais do lote.",
+    "Verify whether each exception has a matching approval record.": "Verificar se cada excecao possui o respectivo registro de aprovacao.",
+    "Contains amendment terms but no attached approval support.": "Traz os termos do aditivo, mas nao traz a comprovacao de aprovacao anexada.",
+    "Flags approval record as pending.": "Indica que o registro de aprovacao esta pendente.",
+    "Shows missing due diligence attachments for strategic suppliers.": "Mostra a ausencia de anexos de diligencia para fornecedores estrategicos.",
+    "Pages 2-4": "Paginas 2-4",
+    "Row 118": "Linha 118",
+    "Supplier folders S-04 to S-08": "Pastas de fornecedores S-04 a S-08",
+    "The batch does not confirm whether missing approval evidence exists outside the submitted scope.": "O lote nao confirma se a comprovacao de aprovacao faltante existe fora do material enviado.",
+    "Two vendor files contain placeholders that suggest pending uploads.": "Dois arquivos de fornecedores trazem marcadores que sugerem upload pendente.",
+    "The review is limited to the submitted document batch.": "A revisao esta limitada ao lote de documentos enviado.",
+    "No direct system-of-record validation was performed.": "Nao houve validacao direta em sistema de registro oficial.",
+    "Two PDF scans remained weak even after automatic OCR fallback.": "Duas digitalizacoes em PDF continuaram fracas mesmo apos o OCR automatico.",
+    "Recover approval support for high-value amendments.": "Recuperar a comprovacao de aprovacao para aditivos de alto valor.",
+    "Close due diligence evidence gaps for strategic suppliers.": "Fechar as lacunas de diligencia documental para fornecedores estrategicos.",
+    "Normalize exception records and reconcile them against approvals.": "Padronizar os registros de excecao e reconciliar com as aprovacoes.",
+    "Detailed evidence register": "Registro detalhado de provas",
+    "Full document inventory": "Inventario completo de documentos",
+    "Rule set reference": "Referencia do conjunto de regras",
 }
 
 CONTENT_LABEL_REPLACEMENTS = {
@@ -158,6 +231,11 @@ def client_label_for_confidence(value: Any) -> str:
 def client_label_for_severity(value: Any) -> str:
     text = normalized_text(value)
     return SEVERITY_LABELS.get(text, text)
+
+
+def client_label_for_compliance_area(value: Any) -> str:
+    text = normalized_text(value)
+    return COMPLIANCE_AREA_LABELS.get(text, translate_client_text(text))
 
 
 def client_label_for_conformity(value: Any) -> str:

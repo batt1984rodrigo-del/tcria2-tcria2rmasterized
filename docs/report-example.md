@@ -1,188 +1,188 @@
-# Compliance Review Report - Procurement And Vendor Documentation
+# Resumo da analise documental de compras e fornecedores
 
-## 1. Report Identification
+## 1. Identificacao do relatorio
 
-- Company: `Atlas Servicos Corporativos S.A.`
-- Review batch: `Procurement Batch 2026 Q2`
-- Report id: `TCRIA-CR-2026-07-001`
-- Generated at: `2026-07-12 15:30 BRT`
-- Review rules: `Corporate Procurement Compliance v1`
+- Empresa: `Atlas Servicos Corporativos S.A.`
+- Lote analisado: `Procurement Batch 2026 Q2`
+- Id do relatorio: `TCRIA-CR-2026-07-001`
+- Gerado em: `2026-07-12 15:30 BRT`
+- Regras aplicadas: `Regras de revisao de compras v1`
 
-## 2. Executive Summary
+## 2. O que precisa ser visto primeiro
 
-The reviewed batch shows a documented procurement process, but the current evidence is not sufficient to support a clean compliance conclusion. The main gaps are missing approval trails, incomplete vendor due diligence support, and inconsistent contract exception records.
+O lote analisado mostra um processo de compras documentado, mas as provas atuais ainda nao sustentam uma conclusao limpa de conformidade. As principais pendencias sao aprovacoes sem comprovacao suficiente, diligencia incompleta de fornecedores e registros irregulares de excecao contratual.
 
-### Immediate Priorities
+### Proximos passos imediatos
 
-1. Recover approval evidence for contracts signed above the delegated threshold.
-2. Complete vendor due diligence support for suppliers marked as strategic.
-3. Regularize exception records linked to emergency procurement requests.
+1. Recuperar provas de aprovacao para contratos assinados acima do limite de delegacao.
+2. Completar a diligencia documental dos fornecedores marcados como estrategicos.
+3. Regularizar os registros de excecao ligados a compras emergenciais.
 
-### Snapshot
+### Resumo rapido
 
-- Documents reviewed: `47`
-- Critical findings: `2`
-- Relevant findings: `4`
-- Informational findings: `3`
-- Overall compliance status: `Attention Required`
+- Documentos revisados: `47`
+- Achados criticos: `2`
+- Achados relevantes: `4`
+- Achados informativos: `3`
+- Situacao geral: `Exige atencao`
 
-## 3. Analysis Scope
+## 3. Escopo da analise
 
-Review of procurement and vendor management documents related to contract approvals, vendor onboarding, and exception handling for the second quarter of 2026.
+Revisao de documentos de compras e gestao de fornecedores ligados a aprovacoes contratuais, cadastro de terceiros e tratamento de excecoes no segundo trimestre de 2026.
 
-- Source: `Uploaded batch from procurement shared drive`
-- Document types: `contracts, approval forms, vendor onboarding files, exception memos, email exports`
-- Business area: `Procurement and Vendor Management`
-- Period covered: `2026-04-01 to 2026-06-30`
+- Origem: `Lote enviado a partir da pasta compartilhada da area de compras`
+- Tipos de documento: `contratos, formularios de aprovacao, arquivos de cadastro de fornecedores, memorandos de excecao e exportacoes de e-mail`
+- Area de negocio: `Compras e gestao de fornecedores`
+- Periodo coberto: `2026-04-01 to 2026-06-30`
 
-### What Was Checked
+### O que foi verificado
 
-- approval trail completeness
-- vendor due diligence support
-- exception justification records
-- contract conformity against internal thresholds
+- completude da trilha de aprovacao
+- diligencia documental de fornecedores
+- registros de justificativa de excecao
+- aderencia contratual aos limites internos
 
-## 4. Reading Coverage And Extraction Provenance
+## 4. Leitura dos documentos e confianca da leitura
 
-### Reading Snapshot
+### Resumo da leitura
 
-- Documents with direct text extraction: `38`
-- Documents read through OCR fallback: `7`
-- Documents where OCR failed: `2`
-- Reading confidence rule: `Confidence reflects reading quality only and does not replace compliance certainty.`
+- Documentos lidos com texto direto: `38`
+- Documentos que dependeram de OCR: `7`
+- Documentos em que o OCR falhou: `2`
+- Regra de confianca da leitura: `A confianca de leitura mede apenas a qualidade da leitura do documento e nao substitui a certeza da analise.`
 
-### Reading Register
+### Documento por documento
 
-| Document | Read method | OCR status | Reading confidence | Notes |
+| Documento | Metodo de leitura | Situacao do OCR | Confianca da leitura | Observacao |
 | --- | --- | --- | --- | --- |
-| AM-17 Contract Amendment.pdf | direct_text | not_needed | high | Embedded text was available on all reviewed pages. |
-| Supplier Due Diligence Scan S-04.pdf | ocr_text | attempted_success | medium | Direct extraction returned no usable text; OCR recovered most checklist content. |
-| Emergency Exception Memo 03.pdf | ocr_failed | attempted_failed | low | Scan quality remained insufficient after OCR fallback. |
-| Approval Index Q2.xlsx | direct_text | not_applicable | high | Native tabular text was read directly. |
+| AM-17 Contract Amendment.pdf | Leitura direta do texto | OCR nao foi necessario | Alta | O texto do arquivo ja estava disponivel nas paginas revisadas. |
+| Supplier Due Diligence Scan S-04.pdf | Leitura por OCR | OCR ajudou a recuperar o texto | Media | A extracao direta nao trouxe texto util, mas o OCR recuperou a maior parte do checklist. |
+| Emergency Exception Memo 03.pdf | OCR nao recuperou texto suficiente | OCR nao conseguiu recuperar o texto | Baixa | A qualidade da digitalizacao continuou insuficiente mesmo apos o OCR. |
+| Approval Index Q2.xlsx | Leitura direta do texto | OCR nao se aplica | Alta | O conteudo tabular nativo foi lido diretamente. |
 
-The report does not hide which reading method was used for the reviewed material.
+O relatorio nao esconde como cada documento foi lido.
 
-## 5. Applied Review Rules
+## 5. Regras e disciplina da analise
 
-The review rules classify findings by evidence completeness, traceability, approval support, and conformity with documented procurement controls.
+As regras desta revisao observam completude das provas, origem das informacoes, suporte de aprovacao e aderencia aos controles documentados de compras.
 
-### Reasoning Policy Check
+### Checagem interna de coerencia
 
-- Policy: `generic_reasoning_policy`
-- Runtime validation: `passed`
-- Findings reviewed: `3`
-- Findings kept inconclusive: `1`
-- Findings requiring document follow-up: `3`
+- Policy aplicada: `generic_reasoning_policy`
+- Validacao em runtime: `aprovada`
+- Achados revisados: `3`
+- Pontos mantidos como inconclusivos: `1`
+- Pontos que pedem mais documentos: `3`
 
-## 6. Main Findings
+## 6. Principais pontos do lote
 
-### F-01 - Missing approval trail for high-value contract amendments
+### F-01 - Falta comprovacao de aprovacao em aditivos contratuais de alto valor
 
-- Compliance area: `Approval Governance`
-- Severity: `Critical`
-- Conformity status: `Noncompliant`
-- Confidence: `High`
+- Area analisada: `Governanca de aprovacoes`
+- Gravidade: `Critico`
+- Situacao: `Nao conforme`
+- Quanto confiamos nesta leitura: `Alta`
 
-#### What Was Identified
+#### O que foi encontrado
 
-Three contract amendments above the delegated threshold were located without signed approval support in the submitted batch.
+Tres aditivos contratuais acima do limite de delegacao foram encontrados sem comprovacao assinada de aprovacao no lote enviado.
 
-#### Why It Matters
+#### Por que isso importa
 
-The absence of approval evidence weakens traceability and creates exposure to unauthorized commercial commitment.
+A falta de comprovacao de aprovacao enfraquece a rastreabilidade e aumenta o risco de compromisso comercial sem autorizacao clara.
 
-#### Supporting Evidence
+#### Quais provas sustentam esse ponto
 
-- Contract amendment file AM-17 with no approval attachment.
-- Approval index spreadsheet marks the record as pending.
-- Email chain references urgency but not final authorization.
+- Arquivo do aditivo contratual AM-17 sem anexo de aprovacao.
+- A planilha de controle de aprovacoes marca o registro como pendente.
+- A troca de e-mails menciona urgencia, mas nao mostra autorizacao final.
 
-#### Recommended Follow-Up
+#### O que fazer agora
 
-- Retrieve signed approval records or formal ratification evidence.
-- Confirm whether the contracts entered execution before approval closure.
+- Recuperar os registros assinados de aprovacao ou prova formal de ratificacao.
+- Confirmar se os contratos entraram em execucao antes do fechamento da aprovacao.
 
-### F-02 - Incomplete vendor due diligence support for strategic suppliers
+### F-02 - Diligencia documental incompleta para fornecedores estrategicos
 
-- Compliance area: `Third-Party Compliance`
-- Severity: `Relevant`
-- Conformity status: `Partially Compliant`
-- Confidence: `High`
+- Area analisada: `Conformidade de terceiros`
+- Gravidade: `Relevante`
+- Situacao: `Parcialmente conforme`
+- Quanto confiamos nesta leitura: `Alta`
 
-#### What Was Identified
+#### O que foi encontrado
 
-Five strategic supplier files include onboarding forms but do not contain the full due diligence support referenced by the checklist.
+Cinco pastas de fornecedores estrategicos contem formularios de cadastro, mas nao trazem toda a diligencia documental indicada no checklist.
 
-#### Why It Matters
+#### Por que isso importa
 
-Incomplete due diligence weakens evidence of onboarding conformity and reduces defensibility of vendor approval decisions.
+A diligencia incompleta enfraquece a prova de conformidade no cadastro e reduz a defensabilidade das aprovacoes de fornecedores.
 
-#### Supporting Evidence
+#### Quais provas sustentam esse ponto
 
-- Checklist marks tax and sanction review as required.
-- Three folders contain only summary forms without source documents.
-- Vendor master sheet lists suppliers as approved.
+- O checklist indica revisao fiscal e de sancoes como obrigatoria.
+- Tres pastas contem apenas formularios-resumo, sem os documentos de origem.
+- A planilha mestre de fornecedores lista esses terceiros como aprovados.
 
-#### Recommended Follow-Up
+#### O que fazer agora
 
-- Request the missing due diligence attachments from procurement operations.
-- Confirm whether approval was granted with an exception process.
+- Solicitar os anexos faltantes de diligencia para a equipe de operacoes de compras.
+- Confirmar se a aprovacao foi concedida por processo de excecao.
 
-### F-03 - Emergency procurement exceptions are documented inconsistently
+### F-03 - As excecoes de compras emergenciais estao documentadas de forma inconsistente
 
-- Compliance area: `Exception Management`
-- Severity: `Attention`
-- Conformity status: `Inconclusive`
-- Confidence: `Medium`
+- Area analisada: `Gestao de excecoes`
+- Gravidade: `Atencao`
+- Situacao: `Inconclusivo`
+- Quanto confiamos nesta leitura: `Media`
 
-#### What Was Identified
+#### O que foi encontrado
 
-Exception memos exist for part of the emergency procurement set, but the rationale and approval pattern are not consistent across documents.
+Existem memorandos de excecao para parte das compras emergenciais, mas a justificativa e o padrao de aprovacao nao sao consistentes entre os documentos.
 
-#### Why It Matters
+#### Por que isso importa
 
-Inconsistent exception records make it difficult to determine whether nonstandard procurement steps were justified and approved correctly.
+Registros inconsistentes de excecao dificultam saber se etapas fora do padrao foram justificadas e aprovadas corretamente.
 
-#### Supporting Evidence
+#### Quais provas sustentam esse ponto
 
-- Two memos use the standard exception form.
-- One request is supported only by email language.
-- No single register consolidates all emergency exceptions.
+- Dois memorandos usam o formulario padrao de excecao.
+- Um pedido esta sustentado apenas por linguagem em e-mail.
+- Nao existe um registro unico consolidando todas as excecoes emergenciais.
 
-#### Recommended Follow-Up
+#### O que fazer agora
 
-- Create a reconciled list of all emergency exceptions in the batch.
-- Verify whether each exception has a matching approval record.
+- Criar uma lista reconciliada de todas as excecoes emergenciais do lote.
+- Verificar se cada excecao possui o respectivo registro de aprovacao.
 
-## 7. Evidence Reference Register
+## 7. Registro de provas
 
-| Evidence id | Document | Reference | Why it matters |
+| Id da prova | Documento | Referencia | Por que isso importa |
 | --- | --- | --- | --- |
-| E-01 | AM-17 Contract Amendment.pdf | Pages 2-4 | Contains amendment terms but no attached approval support. |
-| E-02 | Approval Index Q2.xlsx | Row 118 | Flags approval record as pending. |
-| E-03 | Vendor Checklist Pack.zip | Supplier folders S-04 to S-08 | Shows missing due diligence attachments for strategic suppliers. |
+| E-01 | AM-17 Contract Amendment.pdf | Paginas 2-4 | Traz os termos do aditivo, mas nao traz a comprovacao de aprovacao anexada. |
+| E-02 | Approval Index Q2.xlsx | Linha 118 | Indica que o registro de aprovacao esta pendente. |
+| E-03 | Vendor Checklist Pack.zip | Pastas de fornecedores S-04 a S-08 | Mostra a ausencia de anexos de diligencia para fornecedores estrategicos. |
 
-## 8. Unresolved Points And Limitations
+## 8. O que ainda nao foi fechado
 
-### Unresolved Points
+### Pontos ainda em aberto
 
-- The batch does not confirm whether missing approval evidence exists outside the submitted scope.
-- Two vendor files contain placeholders that suggest pending uploads.
+- O lote nao confirma se a comprovacao de aprovacao faltante existe fora do material enviado.
+- Dois arquivos de fornecedores trazem marcadores que sugerem upload pendente.
 
-### Analysis Limits
+### Limites desta analise
 
-- The review is limited to the submitted document batch.
-- No direct system-of-record validation was performed.
-- Two PDF scans remained weak even after automatic OCR fallback.
+- A revisao esta limitada ao lote de documentos enviado.
+- Nao houve validacao direta em sistema de registro oficial.
+- Duas digitalizacoes em PDF continuaram fracas mesmo apos o OCR automatico.
 
-## 9. Next Review Priorities
+## 9. Prioridades da proxima revisao
 
-1. Recover approval support for high-value amendments.
-2. Close due diligence evidence gaps for strategic suppliers.
-3. Normalize exception records and reconcile them against approvals.
+1. Recuperar a comprovacao de aprovacao para aditivos de alto valor.
+2. Fechar as lacunas de diligencia documental para fornecedores estrategicos.
+3. Padronizar os registros de excecao e reconciliar com as aprovacoes.
 
-## 10. Annexes
+## 10. Anexos
 
-- Detailed evidence register
-- Full document inventory
-- Rule set reference
+- Registro detalhado de provas
+- Inventario completo de documentos
+- Referencia do conjunto de regras
