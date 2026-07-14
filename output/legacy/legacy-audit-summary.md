@@ -38,14 +38,82 @@
 - Marcadores de prova: checklist=6, approval id=4, evidence ref=3, approval note=1, decisionrecord=1, purchase order=1
 - Termos que indicam problema: approval gap=2, exception request=1, incomplete verification=1
 
-## 6. Pendencias e cautelas
+## 6. Como a investigacao ficou
+- Pergunta central: O que este lote legado realmente permite afirmar?
+- Foco desta investigacao: Separar o que ajuda o caso, o que ainda nao pode ser usado e o que ficou limitado pela leitura ou pela origem.
+- Contexto recebido: Lote legado sanitizado para investigacao documental.
+
+### O que chegou
+
+- Arquivos totais considerados: 4.
+- Documentos que podem indicar problema: 2.
+- Documentos de apoio ou contexto: 2.
+- Classificacoes tecnicas distintas no lote: 3.
+
+### O que conseguimos ler
+
+- 3 arquivo(s) tiveram leitura aproveitavel sem grande restricao.
+- 2 arquivo(s) tiveram aproveitamento parcial.
+- 1 arquivo(s) ficaram com texto insuficiente.
+- 1 arquivo(s) dependeram de OCR.
+- 1 arquivo(s) continuaram limitados depois do OCR.
+
+### Hipoteses abertas pela investigacao
+
+- H-01: Parte do lote pode indicar problema relevante. A classificacao tecnica identificou material potencialmente sensivel.
+- H-02: Parte do lote funciona como prova ou contexto util. O lote tem material aproveitavel, mas nem tudo fecha a conclusao sozinho.
+- H-03: Nem todo o lote pode ser usado imediatamente. Ainda existem pendencias estruturais ou de leitura impedindo fechamento mais forte.
+
+### O que sustenta essas hipoteses
+
+- O lote legado reuniu 4 registro(s) tecnicos de documento.
+- Foram agregadas 5 data(s) distinta(s) e 2 valor(es) monetario(s) como sinais auxiliares.
+- H-01: 2 documento(s) foram agrupados como material que pode indicar problema.
+- H-02: 2 documento(s) entraram como apoio ou contexto da leitura.
+- H-03: 1 documento(s) continuam bloqueados no resultado atual.
+
+### O que nao bate
+
+- Parte do lote ajuda a leitura, mas outra parte ainda nao pode ser usada.
+- Alguns arquivos sustentam a leitura, mas outros continuam limitados pela qualidade do texto.
+- Ha trechos do lote em que a leitura avancou mais do que a validacao tecnica conseguiu fechar.
+
+### O que esta faltando
+
+- Ainda faltam arquivos com texto suficiente para fechar parte da leitura.
+- Parte do lote segue sem leitura aproveitavel.
+- Ainda ha documentos com pendencias estruturais ou de origem.
+- Ha verificacoes tecnicas que ainda nao puderam ser avaliadas.
+
+### O que podemos afirmar agora
+
+O lote legado permite uma leitura util, mas ainda nao autoriza conclusao mais forte sem preservar incerteza.
+
+- Parte do lote pode indicar problema relevante.
+- Parte do lote funciona como prova ou contexto util.
+
+### O que ainda nao podemos afirmar
+
+- Nem todo o lote pode ser usado imediatamente.
+- Ainda faltam arquivos com texto suficiente para fechar parte da leitura.
+- Parte do lote segue sem leitura aproveitavel.
+- Ainda ha documentos com pendencias estruturais ou de origem.
+- Ha verificacoes tecnicas que ainda nao puderam ser avaliadas.
+
+### Proximos movimentos da investigacao
+
+- Separar e revisar primeiro os arquivos com texto insuficiente.
+- Tratar os documentos bloqueados como fila prioritaria de complemento e organizacao.
+- Usar primeiro os documentos com leitura mais forte para montar a narrativa base do caso.
+
+## 7. Pendencias e cautelas
 - Preservar incerteza: `sim`
 - Pedir mais documentos: `sim`
 - Nota de cautela: O material atual ainda nao sustenta uma conclusao mais forte.
 - Documento bloqueado nao e documento inutil. Ele apenas ainda nao sustenta um juizo mais forte.
 - Documento ainda nao avaliado nao significa falha final. Significa limite de leitura ou de estrutura.
 
-## 7. Apendice tecnico resumido
+## 8. Apendice tecnico resumido
 - Modo tecnico registrado: `strict-explicit-decision-record`
 - Base tecnica registrada: `TCRIA legacy compliance coverage audit (sanitized example)`
 - Gates com `WARN`: `2`
@@ -59,5 +127,5 @@
 | `control-checklist-gamma.csv` | `SUPPORTING_EVIDENCE_RELEVANT` | `ok` | `high` | `direct_text` | `not_applicable` | `high` | `PASS` | not exposed in legacy item |
 | `unreadable-scan-delta.pdf` | `UNREADABLE` | `unreadable_or_empty` | `low` | `ocr_failed` | `attempted_failed` | `low` | `NOT_EVALUATED` | complianceGate=NOT_EVALUATED; prescriptiveGate=NOT_EVALUATED |
 
-## 8. Observacao final
+## 9. Observacao final
 Este resumo organiza o legado em linguagem de primeira leitura, mas preserva um apendice tecnico para rastreabilidade.

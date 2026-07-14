@@ -19,6 +19,7 @@ from reportlab.platypus import (
     TableStyle,
 )
 
+from investigation_engine import build_report_investigation
 from client_language import (
     client_label_for_compliance_area,
     client_label_for_confidence,
@@ -41,7 +42,9 @@ OUTPUT_PDF = ROOT / "output" / "pdf" / "tcria-compliance-report-example.pdf"
 
 def load_data() -> dict[str, Any]:
     raw_data = json.loads(INPUT_JSON.read_text(encoding="utf-8"))
-    return apply_reasoning_policy(raw_data)
+    enriched_data = apply_reasoning_policy(raw_data)
+    enriched_data["investigation_summary"] = build_report_investigation(enriched_data)
+    return enriched_data
 
 
 def safe(value: Any) -> str:
@@ -61,6 +64,10 @@ def reasoning_summary(data: dict[str, Any]) -> dict[str, Any]:
     return data["reasoning_policy_summary"]
 
 
+def investigation_summary(data: dict[str, Any]) -> dict[str, Any]:
+    return data["investigation_summary"]
+
+
 def client_text(value: Any) -> str:
     return translate_client_text(value)
 
@@ -69,9 +76,33 @@ def client_list(values: list[str]) -> list[str]:
     return [client_text(value) for value in values]
 
 
+def investigation_lines(items: list[dict[str, Any]], detail_label: str) -> list[str]:
+    lines: list[str] = []
+    for item in items:
+        statement = client_text(item.get("statement"))
+        detail = client_text(item.get(detail_label))
+        if detail:
+            lines.append(f"- {item['hypothesis_id']}: {statement}. {detail}")
+        else:
+            lines.append(f"- {item['hypothesis_id']}: {statement}")
+    return lines
+
+
+def evidence_lines(items: list[dict[str, Any]]) -> list[str]:
+    lines: list[str] = []
+    for item in items:
+        evidence_list = [client_text(value) for value in item.get("evidence_lines") or []]
+        if evidence_list:
+            lines.append(f"- {item['hypothesis_id']}: {'; '.join(evidence_list)}")
+        else:
+            lines.append(f"- {item['hypothesis_id']}: sem prova destacada nesta rodada")
+    return lines
+
+
 def render_markdown(data: dict[str, Any]) -> str:
     reading = reading_summary(data)
     reasoning = reasoning_summary(data)
+    investigation = investigation_summary(data)
     lines: list[str] = []
     lines.append(f"# {client_text(data['report_title'])}")
     lines.append("")
@@ -133,13 +164,57 @@ def render_markdown(data: dict[str, Any]) -> str:
     lines.append("")
     lines.append("O relatorio nao esconde como cada documento foi lido.")
     lines.append("")
-    lines.append("## 5. Regras e disciplina da analise")
+    lines.append("## 5. Como a investigacao foi conduzida")
+    lines.append("")
+    lines.append(f"- Pergunta central: {investigation['questioning']['core_question']}")
+    lines.append(f"- Foco desta investigacao: {client_text(investigation['questioning']['focus_statement'])}")
+    lines.append(f"- Contexto recebido: {client_text(investigation['questioning']['received_context'])}")
+    lines.append("")
+    lines.append("### O que chegou")
+    lines.append("")
+    lines.append(bullet_lines(client_list(investigation["inventory"]["items"])))
+    lines.append("")
+    lines.append("### O que conseguimos ler")
+    lines.append("")
+    lines.append(bullet_lines(client_list(investigation["reading"]["items"])))
+    lines.append("")
+    lines.append("### Hipoteses abertas pela investigacao")
+    lines.append("")
+    lines.append("\n".join(investigation_lines(investigation["hypotheses"], "status_reason")))
+    lines.append("")
+    lines.append("### O que sustenta essas hipoteses")
+    lines.append("")
+    lines.append(bullet_lines(client_list(investigation["evidence"]["summary_lines"])))
+    lines.append("")
+    lines.append("\n".join(evidence_lines(investigation["evidence"]["by_hypothesis"])))
+    lines.append("")
+    lines.append("### O que nao bate")
+    lines.append("")
+    lines.append(bullet_lines(client_list(investigation["contradictions"]["items"])))
+    lines.append("")
+    lines.append("### O que esta faltando")
+    lines.append("")
+    lines.append(bullet_lines(client_list(investigation["gaps"]["items"])))
+    lines.append("")
+    lines.append("### O que podemos afirmar agora")
+    lines.append("")
+    lines.append(client_text(investigation["conclusions"]["summary_statement"]))
+    lines.append("")
+    lines.append(bullet_lines(client_list(investigation["conclusions"]["can_affirm"])))
+    lines.append("")
+    lines.append("### O que ainda nao podemos afirmar")
+    lines.append("")
+    lines.append(bullet_lines(client_list(investigation["conclusions"]["cannot_affirm_yet"])))
+    lines.append("")
+    lines.append("### Proximos movimentos da investigacao")
+    lines.append("")
+    lines.append(bullet_lines(client_list(investigation["recommendations"]["items"])))
+    lines.append("")
+    lines.append("### Disciplina interna da analise")
     lines.append("")
     lines.append(client_text(data["rules_summary"]))
     lines.append("")
-    lines.append("### Checagem interna de coerencia")
-    lines.append("")
-    lines.append(f"- Policy aplicada: `{reasoning['policy_name']}`")
+    lines.append("- Postura da conclusao: o relatorio preserva incerteza quando a prova ainda nao fecha.")
     lines.append(f"- Validacao em runtime: `{client_text(reasoning['validation_status'])}`")
     lines.append(f"- Achados revisados: `{reasoning['findings_reviewed']}`")
     lines.append(f"- Pontos mantidos como inconclusivos: `{reasoning['unknown_finding_count']}`")
@@ -417,7 +492,7 @@ def reasoning_summary_table(data: dict[str, Any]) -> Table:
     reasoning = reasoning_summary(data)
     rows = [
         ["Metrica de coerencia", "Valor"],
-        ["Policy", reasoning["policy_name"]],
+        ["Postura da conclusao", "Preserva incerteza quando a prova ainda nao fecha"],
         ["Validacao em runtime", client_text(reasoning["validation_status"])],
         ["Achados revisados", str(reasoning["findings_reviewed"])],
         ["Pontos inconclusivos", str(reasoning["unknown_finding_count"])],
@@ -557,6 +632,8 @@ def add_page_chrome(canvas_obj, doc):
 def render_pdf(data: dict[str, Any]) -> None:
     OUTPUT_PDF.parent.mkdir(parents=True, exist_ok=True)
     styles = build_styles()
+    investigation = investigation_summary(data)
+    reasoning = reasoning_summary(data)
     doc = SimpleDocTemplate(
         str(OUTPUT_PDF),
         pagesize=A4,
@@ -617,10 +694,45 @@ def render_pdf(data: dict[str, Any]) -> None:
             styles["Small"],
         ),
         Spacer(1, 8),
-        Paragraph("Regras e disciplina da analise", styles["SectionHeading"]),
-        Paragraph(safe(client_text(data["rules_summary"])), styles["Body"]),
+        Paragraph("Como a investigacao foi conduzida", styles["SectionHeading"]),
+        Paragraph("<b>Pergunta central</b>", styles["SubHeading"]),
+        Paragraph(safe(investigation["questioning"]["core_question"]), styles["Body"]),
+        Spacer(1, 3),
+        Paragraph("<b>Foco desta investigacao</b>", styles["SubHeading"]),
+        Paragraph(safe(client_text(investigation["questioning"]["focus_statement"])), styles["Body"]),
+        Spacer(1, 3),
+        Paragraph("<b>O que chegou</b>", styles["SubHeading"]),
+        *bullet_paragraphs(client_list(investigation["inventory"]["items"]), styles["Body"]),
+        Spacer(1, 5),
+        Paragraph("<b>O que conseguimos ler</b>", styles["SubHeading"]),
+        *bullet_paragraphs(client_list(investigation["reading"]["items"]), styles["Body"]),
         Spacer(1, 6),
-        Paragraph("Checagem interna de coerencia", styles["SubHeading"]),
+        Paragraph("<b>Hipoteses abertas pela investigacao</b>", styles["SubHeading"]),
+        *bullet_paragraphs(investigation_lines(investigation["hypotheses"], "status_reason"), styles["Body"]),
+        Spacer(1, 5),
+        Paragraph("<b>O que sustenta essas hipoteses</b>", styles["SubHeading"]),
+        *bullet_paragraphs(client_list(investigation["evidence"]["summary_lines"]), styles["Body"]),
+        *bullet_paragraphs(evidence_lines(investigation["evidence"]["by_hypothesis"]), styles["Body"]),
+        Spacer(1, 5),
+        Paragraph("<b>O que nao bate</b>", styles["SubHeading"]),
+        *bullet_paragraphs(client_list(investigation["contradictions"]["items"]), styles["Body"]),
+        Spacer(1, 5),
+        Paragraph("<b>O que esta faltando</b>", styles["SubHeading"]),
+        *bullet_paragraphs(client_list(investigation["gaps"]["items"]), styles["Body"]),
+        Spacer(1, 5),
+        Paragraph("<b>O que podemos afirmar agora</b>", styles["SubHeading"]),
+        Paragraph(safe(client_text(investigation["conclusions"]["summary_statement"])), styles["Body"]),
+        *bullet_paragraphs(client_list(investigation["conclusions"]["can_affirm"]), styles["Body"]),
+        Spacer(1, 5),
+        Paragraph("<b>O que ainda nao podemos afirmar</b>", styles["SubHeading"]),
+        *bullet_paragraphs(client_list(investigation["conclusions"]["cannot_affirm_yet"]), styles["Body"]),
+        Spacer(1, 5),
+        Paragraph("<b>Proximos movimentos da investigacao</b>", styles["SubHeading"]),
+        *bullet_paragraphs(client_list(investigation["recommendations"]["items"]), styles["Body"]),
+        Spacer(1, 6),
+        Paragraph("Disciplina interna da analise", styles["SubHeading"]),
+        Paragraph(safe(client_text(data["rules_summary"])), styles["Body"]),
+        Spacer(1, 4),
         reasoning_summary_table(data),
         Spacer(1, 6),
         Paragraph("Como ler a gravidade dos pontos", styles["SubHeading"]),

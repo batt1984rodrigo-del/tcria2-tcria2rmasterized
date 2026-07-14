@@ -7,6 +7,7 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
+from investigation_engine import build_legacy_investigation
 from client_language import (
     client_label_for_classification,
     summarize_document_for_client,
@@ -343,6 +344,7 @@ def build_report(payload: dict[str, Any]) -> dict[str, Any]:
     }
     report["client_documents"] = [summarize_document_for_client(doc) for doc in report["documents"]]
     report["reasoning"] = build_legacy_reasoning_summary(report)
+    report["investigation"] = build_legacy_investigation(report)
     return report
 
 
@@ -356,6 +358,7 @@ def render_markdown(report: dict[str, Any]) -> str:
     coverage = report["coverage"]
     signals = report["signals"]
     reasoning = report["reasoning"]
+    investigation = report["investigation"]
 
     lines: list[str] = []
     lines.append("# Resumo para primeira leitura do lote legado")
@@ -404,14 +407,73 @@ def render_markdown(report: dict[str, Any]) -> str:
     lines.append(f"- Marcadores de prova: {translate_client_text(format_counter(signals['evidence_markers']))}")
     lines.append(f"- Termos que indicam problema: {translate_client_text(format_counter(signals['accusation_terms']))}")
     lines.append("")
-    lines.append("## 6. Pendencias e cautelas")
+    lines.append("## 6. Como a investigacao ficou")
+    lines.append(f"- Pergunta central: {investigation['questioning']['core_question']}")
+    lines.append(f"- Foco desta investigacao: {translate_client_text(investigation['questioning']['focus_statement'])}")
+    lines.append(f"- Contexto recebido: {translate_client_text(investigation['questioning']['received_context'])}")
+    lines.append("")
+    lines.append("### O que chegou")
+    lines.append("")
+    for item in investigation["inventory"]["items"]:
+        lines.append(f"- {translate_client_text(item)}")
+    lines.append("")
+    lines.append("### O que conseguimos ler")
+    lines.append("")
+    for item in investigation["reading"]["items"]:
+        lines.append(f"- {translate_client_text(item)}")
+    lines.append("")
+    lines.append("### Hipoteses abertas pela investigacao")
+    lines.append("")
+    for item in investigation["hypotheses"]:
+        statement = translate_client_text(item["statement"]).rstrip(".")
+        lines.append(
+            f"- {item['hypothesis_id']}: {statement}. {translate_client_text(item['status_reason'])}"
+        )
+    lines.append("")
+    lines.append("### O que sustenta essas hipoteses")
+    lines.append("")
+    for item in investigation["evidence"]["summary_lines"]:
+        lines.append(f"- {translate_client_text(item)}")
+    for item in investigation["evidence"]["by_hypothesis"]:
+        evidence_lines = [translate_client_text(value) for value in item["evidence_lines"]]
+        joined_evidence = "; ".join(evidence_lines) if evidence_lines else "sem prova destacada nesta rodada"
+        lines.append(f"- {item['hypothesis_id']}: {joined_evidence}")
+    lines.append("")
+    lines.append("### O que nao bate")
+    lines.append("")
+    for item in investigation["contradictions"]["items"]:
+        lines.append(f"- {translate_client_text(item)}")
+    lines.append("")
+    lines.append("### O que esta faltando")
+    lines.append("")
+    for item in investigation["gaps"]["items"]:
+        lines.append(f"- {translate_client_text(item)}")
+    lines.append("")
+    lines.append("### O que podemos afirmar agora")
+    lines.append("")
+    lines.append(translate_client_text(investigation["conclusions"]["summary_statement"]))
+    lines.append("")
+    for item in investigation["conclusions"]["can_affirm"]:
+        lines.append(f"- {translate_client_text(item)}")
+    lines.append("")
+    lines.append("### O que ainda nao podemos afirmar")
+    lines.append("")
+    for item in investigation["conclusions"]["cannot_affirm_yet"]:
+        lines.append(f"- {translate_client_text(item)}")
+    lines.append("")
+    lines.append("### Proximos movimentos da investigacao")
+    lines.append("")
+    for item in investigation["recommendations"]["items"]:
+        lines.append(f"- {translate_client_text(item)}")
+    lines.append("")
+    lines.append("## 7. Pendencias e cautelas")
     lines.append(f"- Preservar incerteza: `{'sim' if reasoning['must_preserve_unknown'] else 'nao'}`")
     lines.append(f"- Pedir mais documentos: `{'sim' if reasoning['must_request_more_documents'] else 'nao'}`")
     lines.append(f"- Nota de cautela: {translate_client_text(reasoning['conclusion_note'])}")
     lines.append("- Documento bloqueado nao e documento inutil. Ele apenas ainda nao sustenta um juizo mais forte.")
     lines.append("- Documento ainda nao avaliado nao significa falha final. Significa limite de leitura ou de estrutura.")
     lines.append("")
-    lines.append("## 7. Apendice tecnico resumido")
+    lines.append("## 8. Apendice tecnico resumido")
     lines.append(f"- Modo tecnico registrado: `{report['mode']}`")
     lines.append(f"- Base tecnica registrada: `{report['audit_basis']}`")
     lines.append(f"- Gates com `WARN`: `{gate_counts['WARN']}`")
@@ -427,7 +489,7 @@ def render_markdown(report: dict[str, Any]) -> str:
             )
         )
     lines.append("")
-    lines.append("## 8. Observacao final")
+    lines.append("## 9. Observacao final")
     lines.append(
         "Este resumo organiza o legado em linguagem de primeira leitura, mas preserva um apendice tecnico para rastreabilidade."
     )

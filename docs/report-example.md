@@ -62,13 +62,86 @@ Revisao de documentos de compras e gestao de fornecedores ligados a aprovacoes c
 
 O relatorio nao esconde como cada documento foi lido.
 
-## 5. Regras e disciplina da analise
+## 5. Como a investigacao foi conduzida
+
+- Pergunta central: O que precisamos descobrir neste lote?
+- Foco desta investigacao: Precisamos entender se o material enviado sustenta, com prova suficiente, esta frente de investigacao: Revisao de documentos de compras e gestao de fornecedores ligados a aprovacoes contratuais, cadastro de terceiros e tratamento de excecoes no segundo trimestre de 2026.
+- Contexto recebido: Lote enviado a partir da pasta compartilhada da area de compras
+
+### O que chegou
+
+- Lote analisado: Procurement Batch 2026 Q2.
+- Documentos revisados nesta rodada: 47.
+- Origem declarada do material: Lote enviado a partir da pasta compartilhada da area de compras.
+- Tipos de documento recebidos: contratos, formularios de aprovacao, arquivos de cadastro de fornecedores, memorandos de excecao e exportacoes de e-mail.
+- Registros de prova formal separados: 3.
+- Pontos principais abertos pela analise: 3.
+
+### O que conseguimos ler
+
+- 38 documentos foram lidos com texto direto.
+- 7 documentos dependeram de OCR para recuperar leitura util.
+- 2 documentos continuaram com leitura limitada mesmo apos OCR.
+- A confianca de leitura mede apenas a qualidade da leitura do documento e nao substitui a certeza da analise.
+
+### Hipoteses abertas pela investigacao
+
+- H-01: Falta comprovacao de aprovacao em aditivos contratuais de alto valor. Situacao nao conforme com confianca alta.
+- H-02: Diligencia documental incompleta para fornecedores estrategicos. Situacao parcialmente conforme com confianca alta.
+- H-03: As excecoes de compras emergenciais estao documentadas de forma inconsistente. Situacao inconclusivo com confianca media.
+
+### O que sustenta essas hipoteses
+
+- As hipoteses atuais se apoiam em 9 referencia(s) descritas nos achados.
+- O registro formal de provas separado traz 3 itens adicionais para ancoragem.
+
+- H-01: Arquivo do aditivo contratual AM-17 sem anexo de aprovacao.; A planilha de controle de aprovacoes marca o registro como pendente.; A troca de e-mails menciona urgencia, mas nao mostra autorizacao final.
+- H-02: O checklist indica revisao fiscal e de sancoes como obrigatoria.; Tres pastas contem apenas formularios-resumo, sem os documentos de origem.; A planilha mestre de fornecedores lista esses terceiros como aprovados.
+- H-03: Dois memorandos usam o formulario padrao de excecao.; Um pedido esta sustentado apenas por linguagem em e-mail.; Nao existe um registro unico consolidando todas as excecoes emergenciais.
+
+### O que nao bate
+
+- Existe registro marcado como pendente onde deveria haver fechamento documental.
+- A urgencia aparece no material, mas a autorizacao final nao aparece nas provas reunidas.
+- Algo aparece como aprovado, mas a prova que sustentaria essa aprovacao segue incompleta.
+- Parte do que deveria estar formalizado aparece apenas em e-mail.
+- Documentos semelhantes nao seguem o mesmo padrao de justificativa e aprovacao.
+
+### O que esta faltando
+
+- O lote nao confirma se a comprovacao de aprovacao faltante existe fora do material enviado.
+- Dois arquivos de fornecedores trazem marcadores que sugerem upload pendente.
+- A revisao esta limitada ao lote de documentos enviado.
+- Nao houve validacao direta em sistema de registro oficial.
+- Duas digitalizacoes em PDF continuaram fracas mesmo apos o OCR automatico.
+
+### O que podemos afirmar agora
+
+O lote analisado mostra um processo de compras documentado, mas as provas atuais ainda nao sustentam uma conclusao limpa de conformidade. As principais pendencias sao aprovacoes sem comprovacao suficiente, diligencia incompleta de fornecedores e registros irregulares de excecao contratual.
+
+- Falta comprovacao de aprovacao em aditivos contratuais de alto valor
+- Diligencia documental incompleta para fornecedores estrategicos
+
+### O que ainda nao podemos afirmar
+
+- As excecoes de compras emergenciais estao documentadas de forma inconsistente
+- O lote nao confirma se a comprovacao de aprovacao faltante existe fora do material enviado.
+- Dois arquivos de fornecedores trazem marcadores que sugerem upload pendente.
+
+### Proximos movimentos da investigacao
+
+- Recuperar provas de aprovacao para contratos assinados acima do limite de delegacao.
+- Completar a diligencia documental dos fornecedores marcados como estrategicos.
+- Regularizar os registros de excecao ligados a compras emergenciais.
+- Recuperar a comprovacao de aprovacao para aditivos de alto valor.
+- Fechar as lacunas de diligencia documental para fornecedores estrategicos.
+- Padronizar os registros de excecao e reconciliar com as aprovacoes.
+
+### Disciplina interna da analise
 
 As regras desta revisao observam completude das provas, origem das informacoes, suporte de aprovacao e aderencia aos controles documentados de compras.
 
-### Checagem interna de coerencia
-
-- Policy aplicada: `generic_reasoning_policy`
+- Postura da conclusao: o relatorio preserva incerteza quando a prova ainda nao fecha.
 - Validacao em runtime: `aprovada`
 - Achados revisados: `3`
 - Pontos mantidos como inconclusivos: `1`
