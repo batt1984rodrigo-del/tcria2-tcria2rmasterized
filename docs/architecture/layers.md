@@ -4,7 +4,7 @@ This document defines the main system layers for the current product workflow.
 
 Current workflow:
 
-`bounded document batch -> analysis -> structured review report`
+`bounded document batch -> reading -> correlation -> investigation -> structured review report`
 
 ## Layer 1: Ingestion and Preprocessing
 
@@ -21,19 +21,50 @@ Responsibilities include:
 - metadata capture;
 - preprocessing for downstream analysis.
 
-## Layer 2: Analysis and Correlation
+## Layer 2: Comparable Fact Preparation
 
-This layer processes the prepared material and derives structured results.
+This layer converts different document types into a common comparison shape.
 
 Responsibilities include:
 
 - signal extraction;
-- classification;
-- cross-document correlation;
-- finding generation;
-- evidence linking.
+- subject and entity identification;
+- date, value, deadline and status normalization;
+- responsible party and approval extraction;
+- reference and process-step capture.
 
-## Layer 3: Policy and Scoring
+## Layer 3: Correlation and Patterns
+
+This layer compares only documents with a confirmed relationship or an explicit
+pattern group.
+
+Responsibilities include:
+
+- grouping by contract, supplier, process, event, period or operation;
+- date, value, deadline, status, responsibility and approval comparison;
+- missing-reference detection;
+- temporal-sequence validation;
+- pattern and procedure outlier detection;
+- generation of evidence-linked investigation signals;
+- explanation of what a professional should verify next.
+
+The correlation layer looks for relevant divergence. It does not declare an
+error, assign intent or make a final institutional decision.
+
+## Layer 4: Investigation and Analysis
+
+This layer converts correlated facts and signals into reviewable investigative
+reasoning.
+
+Responsibilities include:
+
+- hypothesis formation;
+- contradiction and gap review;
+- finding generation;
+- evidence linking;
+- separation between what can and cannot yet be affirmed.
+
+## Layer 5: Policy and Scoring
 
 This layer applies the configured review rules to analysis results.
 
@@ -45,7 +76,7 @@ Responsibilities include:
 - accountability classification;
 - rule thresholds.
 
-## Layer 4: Output Composition
+## Layer 6: Output Composition
 
 This layer converts analysis results into consistent deliverables.
 
@@ -59,7 +90,7 @@ Responsibilities include:
 - client-facing template application;
 - limitation exposure.
 
-## Layer 5: Delivery Surfaces
+## Layer 7: Delivery Surfaces
 
 This is how people interact with the workflow.
 
@@ -78,7 +109,9 @@ It may include:
 This repository should primarily organize software concerns around:
 
 - Ingestion and Preprocessing;
-- Analysis and Correlation;
+- Comparable Fact Preparation;
+- Correlation and Patterns;
+- Investigation and Analysis;
 - Policy and Scoring;
 - Output Composition;
 - Delivery Surfaces.

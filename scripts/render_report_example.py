@@ -52,6 +52,47 @@ def safe(value: Any) -> str:
     return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
 
+TABLE_BODY_STYLE = ParagraphStyle(
+    name="TableBodyCell",
+    fontName="Helvetica",
+    fontSize=7.6,
+    leading=9.2,
+    textColor=colors.HexColor("#111827"),
+    splitLongWords=True,
+)
+TABLE_LABEL_STYLE = ParagraphStyle(
+    name="TableLabelCell",
+    parent=TABLE_BODY_STYLE,
+    fontName="Helvetica-Bold",
+)
+TABLE_HEADER_STYLE = ParagraphStyle(
+    name="TableHeaderCell",
+    parent=TABLE_BODY_STYLE,
+    fontName="Helvetica-Bold",
+    textColor=colors.white,
+)
+
+
+def table_cell(value: Any, style: ParagraphStyle = TABLE_BODY_STYLE) -> Paragraph:
+    return Paragraph(safe(value), style)
+
+
+def wrapped_table_rows(rows: list[list[Any]], has_header: bool = False) -> list[list[Paragraph]]:
+    wrapped: list[list[Paragraph]] = []
+    for row_index, row in enumerate(rows):
+        wrapped_row: list[Paragraph] = []
+        for column_index, value in enumerate(row):
+            if has_header and row_index == 0:
+                style = TABLE_HEADER_STYLE
+            elif column_index == 0:
+                style = TABLE_LABEL_STYLE
+            else:
+                style = TABLE_BODY_STYLE
+            wrapped_row.append(table_cell(value, style))
+        wrapped.append(wrapped_row)
+    return wrapped
+
+
 def bullet_lines(items: list[str]) -> str:
     return "\n".join(f"- {item}" for item in items)
 
@@ -82,9 +123,9 @@ def investigation_lines(items: list[dict[str, Any]], detail_label: str) -> list[
         statement = client_text(item.get("statement"))
         detail = client_text(item.get(detail_label))
         if detail:
-            lines.append(f"- {item['hypothesis_id']}: {statement}. {detail}")
+            lines.append(f"{item['hypothesis_id']}: {statement}. {detail}")
         else:
-            lines.append(f"- {item['hypothesis_id']}: {statement}")
+            lines.append(f"{item['hypothesis_id']}: {statement}")
     return lines
 
 
@@ -93,9 +134,35 @@ def evidence_lines(items: list[dict[str, Any]]) -> list[str]:
     for item in items:
         evidence_list = [client_text(value) for value in item.get("evidence_lines") or []]
         if evidence_list:
-            lines.append(f"- {item['hypothesis_id']}: {'; '.join(evidence_list)}")
+            lines.append(f"{item['hypothesis_id']}: {'; '.join(evidence_list)}")
         else:
-            lines.append(f"- {item['hypothesis_id']}: sem prova destacada nesta rodada")
+            lines.append(f"{item['hypothesis_id']}: sem prova destacada nesta rodada")
+    return lines
+
+
+def correlation_group_lines(groups: list[dict[str, Any]]) -> list[str]:
+    lines: list[str] = []
+    for group in groups:
+        names = [item["document_name"] for item in group.get("documents") or []]
+        lines.append(f"{group['relationship']}: {'; '.join(names)}")
+    return lines
+
+
+def correlation_signal_lines(signals: list[dict[str, Any]]) -> list[str]:
+    lines: list[str] = []
+    for signal in signals:
+        lines.extend(
+            [
+                f"#### {signal['signal_id']} - {signal['title']}",
+                "",
+                f"- Relacao analisada: {signal['relationship']}",
+                f"- O que divergiu: {signal['observation']}",
+                f"- Por que pode importar: {signal['impact']}",
+                f"- Quanto confiamos neste sinal: {signal['confidence']}",
+                f"- O que verificar: {signal['what_to_verify']}",
+                "",
+            ]
+        )
     return lines
 
 
@@ -178,15 +245,32 @@ def render_markdown(data: dict[str, Any]) -> str:
     lines.append("")
     lines.append(bullet_lines(client_list(investigation["reading"]["items"])))
     lines.append("")
+    correlation = investigation["correlation"]
+    lines.append("### Como os documentos foram relacionados")
+    lines.append("")
+    lines.append(correlation["summary"])
+    lines.append("")
+    lines.append(f"- Pergunta de consistencia: {correlation['consistency_question']}")
+    lines.append(f"- Fichas comparadas: `{correlation['documents_compared']}`")
+    lines.append(f"- Grupos realmente comparados: `{correlation['groups_compared']}`")
+    lines.append(bullet_lines(correlation_group_lines(correlation["groups"])))
+    lines.append("")
+    lines.append("### Sinais encontrados na comparacao")
+    lines.append("")
+    if correlation["signals"]:
+        lines.extend(correlation_signal_lines(correlation["signals"]))
+    else:
+        lines.append("Nenhum sinal comparativo foi aberto pelas regras atuais.")
+        lines.append("")
     lines.append("### Hipoteses abertas pela investigacao")
     lines.append("")
-    lines.append("\n".join(investigation_lines(investigation["hypotheses"], "status_reason")))
+    lines.append(bullet_lines(investigation_lines(investigation["hypotheses"], "status_reason")))
     lines.append("")
     lines.append("### O que sustenta essas hipoteses")
     lines.append("")
     lines.append(bullet_lines(client_list(investigation["evidence"]["summary_lines"])))
     lines.append("")
-    lines.append("\n".join(evidence_lines(investigation["evidence"]["by_hypothesis"])))
+    lines.append(bullet_lines(evidence_lines(investigation["evidence"]["by_hypothesis"])))
     lines.append("")
     lines.append("### O que nao bate")
     lines.append("")
@@ -372,7 +456,7 @@ def severity_color(severity: str):
 
 
 def label_value_table(rows: list[list[str]], col_widths: list[float]) -> Table:
-    table = Table(rows, colWidths=col_widths)
+    table = Table(wrapped_table_rows(rows), colWidths=col_widths)
     table.setStyle(
         TableStyle(
             [
@@ -402,7 +486,7 @@ def issue_summary_table(data: dict[str, Any]) -> Table:
         ["Achados informativos", str(data["informational_count"])],
         ["Situacao geral", client_label_for_overall_status(data["overall_status"])],
     ]
-    table = Table(rows, colWidths=[58 * mm, 42 * mm], repeatRows=1)
+    table = Table(wrapped_table_rows(rows, has_header=True), colWidths=[58 * mm, 42 * mm], repeatRows=1)
     style = TableStyle(
         [
             ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#0f172a")),
@@ -432,7 +516,7 @@ def reading_summary_table(data: dict[str, Any]) -> Table:
         ["OCR sem recuperacao suficiente", str(reading["ocr_failed_documents"])],
         ["Regra de confianca", client_text(reading["reading_confidence_rule"])],
     ]
-    table = Table(rows, colWidths=[54 * mm, 112 * mm], repeatRows=1)
+    table = Table(wrapped_table_rows(rows, has_header=True), colWidths=[54 * mm, 112 * mm], repeatRows=1)
     table.setStyle(
         TableStyle(
             [
@@ -466,7 +550,11 @@ def reading_register_table(data: dict[str, Any]) -> Table:
                 client_text(item["notes"]),
             ]
         )
-    table = Table(rows, colWidths=[46 * mm, 24 * mm, 30 * mm, 22 * mm, 44 * mm], repeatRows=1)
+    table = Table(
+        wrapped_table_rows(rows, has_header=True),
+        colWidths=[42 * mm, 25 * mm, 28 * mm, 20 * mm, 51 * mm],
+        repeatRows=1,
+    )
     table.setStyle(
         TableStyle(
             [
@@ -498,7 +586,7 @@ def reasoning_summary_table(data: dict[str, Any]) -> Table:
         ["Pontos inconclusivos", str(reasoning["unknown_finding_count"])],
         ["Pontos que pedem documentos", str(reasoning["document_request_count"])],
     ]
-    table = Table(rows, colWidths=[54 * mm, 112 * mm], repeatRows=1)
+    table = Table(wrapped_table_rows(rows, has_header=True), colWidths=[54 * mm, 112 * mm], repeatRows=1)
     table.setStyle(
         TableStyle(
             [
@@ -522,6 +610,25 @@ def reasoning_summary_table(data: dict[str, Any]) -> Table:
 
 def bullet_paragraphs(items: list[str], style: ParagraphStyle) -> list[Paragraph]:
     return [Paragraph(f"- {safe(item)}", style) for item in items]
+
+
+def correlation_signal_flowables(signals: list[dict[str, Any]], styles) -> list[Any]:
+    flowables: list[Any] = []
+    for signal in signals:
+        flowables.append(
+            KeepTogether(
+                [
+                Paragraph(f"{safe(signal['signal_id'])} - {safe(signal['title'])}", styles["SubHeading"]),
+                Paragraph(f"<b>Relacao analisada:</b> {safe(signal['relationship'])}", styles["Body"]),
+                Paragraph(f"<b>O que divergiu:</b> {safe(signal['observation'])}", styles["Body"]),
+                Paragraph(f"<b>Por que pode importar:</b> {safe(signal['impact'])}", styles["Body"]),
+                Paragraph(f"<b>Quanto confiamos:</b> {safe(signal['confidence'])}", styles["Body"]),
+                Paragraph(f"<b>O que verificar:</b> {safe(signal['what_to_verify'])}", styles["Body"]),
+                Spacer(1, 5),
+                ]
+            )
+        )
+    return flowables
 
 
 def finding_block(item: dict[str, Any], styles) -> KeepTogether:
@@ -591,7 +698,11 @@ def evidence_table(data: dict[str, Any]) -> Table:
                 client_text(item["why_it_matters"]),
             ]
         )
-    table = Table(rows, colWidths=[22 * mm, 52 * mm, 28 * mm, 76 * mm], repeatRows=1)
+    table = Table(
+        wrapped_table_rows(rows, has_header=True),
+        colWidths=[20 * mm, 46 * mm, 27 * mm, 73 * mm],
+        repeatRows=1,
+    )
     table.setStyle(
         TableStyle(
             [
@@ -633,6 +744,7 @@ def render_pdf(data: dict[str, Any]) -> None:
     OUTPUT_PDF.parent.mkdir(parents=True, exist_ok=True)
     styles = build_styles()
     investigation = investigation_summary(data)
+    correlation = investigation["correlation"]
     reasoning = reasoning_summary(data)
     doc = SimpleDocTemplate(
         str(OUTPUT_PDF),
@@ -683,8 +795,12 @@ def render_pdf(data: dict[str, Any]) -> None:
         Paragraph("O que foi verificado", styles["SubHeading"]),
         *bullet_paragraphs(client_list(data["checks"]), styles["Body"]),
         Spacer(1, 8),
-        Paragraph("Leitura dos documentos e confianca da leitura", styles["SectionHeading"]),
-        reading_summary_table(data),
+        KeepTogether(
+            [
+                Paragraph("Leitura dos documentos e confianca da leitura", styles["SectionHeading"]),
+                reading_summary_table(data),
+            ]
+        ),
         Spacer(1, 6),
         Paragraph("Documento por documento", styles["SubHeading"]),
         reading_register_table(data),
@@ -706,6 +822,21 @@ def render_pdf(data: dict[str, Any]) -> None:
         Spacer(1, 5),
         Paragraph("<b>O que conseguimos ler</b>", styles["SubHeading"]),
         *bullet_paragraphs(client_list(investigation["reading"]["items"]), styles["Body"]),
+        Spacer(1, 6),
+        KeepTogether(
+            [
+                Paragraph("<b>Como os documentos foram relacionados</b>", styles["SubHeading"]),
+                Paragraph(safe(correlation["summary"]), styles["Body"]),
+                Paragraph(
+                    f"<b>Pergunta de consistencia:</b> {safe(correlation['consistency_question'])}",
+                    styles["Body"],
+                ),
+                *bullet_paragraphs(correlation_group_lines(correlation["groups"]), styles["Body"]),
+            ]
+        ),
+        Spacer(1, 6),
+        Paragraph("<b>Sinais encontrados na comparacao</b>", styles["SubHeading"]),
+        *correlation_signal_flowables(correlation["signals"], styles),
         Spacer(1, 6),
         Paragraph("<b>Hipoteses abertas pela investigacao</b>", styles["SubHeading"]),
         *bullet_paragraphs(investigation_lines(investigation["hypotheses"], "status_reason"), styles["Body"]),

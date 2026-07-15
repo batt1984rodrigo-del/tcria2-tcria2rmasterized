@@ -5,8 +5,12 @@ from typing import Any
 from ._helpers import dedupe_keep_order, translated_list
 
 
-def build_report_recommendations(data: dict[str, Any]) -> dict[str, Any]:
+def build_report_recommendations(data: dict[str, Any], correlation: dict[str, Any] | None = None) -> dict[str, Any]:
     items = translated_list(data.get("immediate_priorities")) + translated_list(data.get("next_priorities"))
+    for signal in (correlation or {}).get("signals") or []:
+        question = str(signal.get("what_to_verify") or "").strip()
+        if question:
+            items.append(question)
     return {"items": dedupe_keep_order(items)}
 
 

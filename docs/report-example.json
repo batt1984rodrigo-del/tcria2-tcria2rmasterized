@@ -57,6 +57,140 @@
       "notes": "Native tabular text was read directly."
     }
   ],
+  "correlation_documents": [
+    {
+      "document_id": "AM-17",
+      "document_name": "AM-17 Contract Amendment.pdf",
+      "document_type": "aditivo contratual",
+      "group_id": "contratacao-am-17",
+      "relation_label": "mesma contratacao",
+      "subject": "alteracao da contratacao AM-17",
+      "entities": ["Fornecedor Atlas Industrial"],
+      "dates": {
+        "data_de_execucao": "2026-04-10"
+      },
+      "values": {
+        "valor_total": "R$ 850.000,00"
+      },
+      "deadlines": {
+        "prazo_contratual_dias": 120
+      },
+      "statuses": {
+        "situacao_da_aprovacao": "aprovado"
+      },
+      "responsible_parties": {
+        "responsavel_pela_aprovacao": "Diretoria Comercial"
+      },
+      "approvals": {
+        "aprovacao_final": "registrada"
+      },
+      "identifiers": {
+        "referencia_do_contrato": "CT-AM-17"
+      },
+      "required_references": ["APR-AM-17"]
+    },
+    {
+      "document_id": "APPROVAL-INDEX-118",
+      "document_name": "Approval Index Q2.xlsx - linha 118",
+      "document_type": "indice de aprovacoes",
+      "group_id": "contratacao-am-17",
+      "relation_label": "mesma contratacao",
+      "subject": "alteracao da contratacao AM-17",
+      "entities": ["Fornecedor Atlas Industrial"],
+      "dates": {
+        "data_de_aprovacao": "2026-04-15"
+      },
+      "values": {
+        "valor_total": "R$ 850.000,00"
+      },
+      "deadlines": {
+        "prazo_contratual_dias": 90
+      },
+      "statuses": {
+        "situacao_da_aprovacao": "pendente"
+      },
+      "responsible_parties": {
+        "responsavel_pela_aprovacao": "Diretoria Financeira"
+      },
+      "approvals": {
+        "aprovacao_final": "pendente"
+      },
+      "identifiers": {
+        "referencia_do_contrato": "CT-AM-17"
+      }
+    },
+    {
+      "document_id": "EMAIL-AM-17",
+      "document_name": "Urgent Amendment AM-17.eml",
+      "document_type": "email",
+      "group_id": "contratacao-am-17",
+      "relation_label": "mesma contratacao",
+      "subject": "alteracao da contratacao AM-17",
+      "entities": ["Fornecedor Atlas Industrial"],
+      "values": {
+        "valor_total": "R$ 850.000,00"
+      },
+      "identifiers": {
+        "referencia_do_contrato": "CT-AM-17"
+      }
+    },
+    {
+      "document_id": "EXC-01",
+      "document_name": "Emergency Exception Memo 01.pdf",
+      "document_type": "memorando de excecao",
+      "group_id": "excecao-emergencial-01",
+      "pattern_group": "excecoes-de-compra-emergencial",
+      "subject": "excecao de compra emergencial",
+      "features": {
+        "assinatura": true,
+        "data": true,
+        "aprovacao_formal": true
+      },
+      "process_steps": ["solicitacao", "aprovacao", "assinatura"]
+    },
+    {
+      "document_id": "EXC-02",
+      "document_name": "Emergency Exception Memo 02.pdf",
+      "document_type": "memorando de excecao",
+      "group_id": "excecao-emergencial-02",
+      "pattern_group": "excecoes-de-compra-emergencial",
+      "subject": "excecao de compra emergencial",
+      "features": {
+        "assinatura": true,
+        "data": true,
+        "aprovacao_formal": true
+      },
+      "process_steps": ["solicitacao", "aprovacao", "assinatura"]
+    },
+    {
+      "document_id": "EXC-03",
+      "document_name": "Emergency Exception Memo 03.pdf",
+      "document_type": "memorando de excecao",
+      "group_id": "excecao-emergencial-03",
+      "pattern_group": "excecoes-de-compra-emergencial",
+      "subject": "excecao de compra emergencial",
+      "features": {
+        "assinatura": true,
+        "data": true,
+        "aprovacao_formal": true
+      },
+      "process_steps": ["solicitacao", "aprovacao", "assinatura"]
+    },
+    {
+      "document_id": "EXC-04",
+      "document_name": "Emergency Exception Request 04.eml",
+      "document_type": "registro de excecao",
+      "group_id": "excecao-emergencial-04",
+      "pattern_group": "excecoes-de-compra-emergencial",
+      "subject": "excecao de compra emergencial",
+      "features": {
+        "assinatura": false,
+        "data": true,
+        "aprovacao_formal": false
+      },
+      "process_steps": ["solicitacao", "assinatura", "aprovacao"]
+    }
+  ],
   "checks": [
     "approval trail completeness",
     "vendor due diligence support",

@@ -75,6 +75,7 @@ O relatorio nao esconde como cada documento foi lido.
 - Origem declarada do material: Lote enviado a partir da pasta compartilhada da area de compras.
 - Tipos de documento recebidos: contratos, formularios de aprovacao, arquivos de cadastro de fornecedores, memorandos de excecao e exportacoes de e-mail.
 - Registros de prova formal separados: 3.
+- Fichas estruturadas para comparacao: 7.
 - Pontos principais abertos pela analise: 3.
 
 ### O que conseguimos ler
@@ -83,6 +84,90 @@ O relatorio nao esconde como cada documento foi lido.
 - 7 documentos dependeram de OCR para recuperar leitura util.
 - 2 documentos continuaram com leitura limitada mesmo apos OCR.
 - A confianca de leitura mede apenas a qualidade da leitura do documento e nao substitui a certeza da analise.
+
+### Como os documentos foram relacionados
+
+7 fichas foram comparadas em 2 grupos e abriram 9 sinais para verificacao.
+
+- Pergunta de consistencia: O conjunto de documentos conta a mesma historia?
+- Fichas comparadas: `7`
+- Grupos realmente comparados: `2`
+- mesma contratacao: AM-17 Contract Amendment.pdf; Approval Index Q2.xlsx - linha 118; Urgent Amendment AM-17.eml
+- mesmo grupo de procedimento: Emergency Exception Memo 01.pdf; Emergency Exception Memo 02.pdf; Emergency Exception Memo 03.pdf; Emergency Exception Request 04.eml
+
+### Sinais encontrados na comparacao
+
+#### S-01 - Execucao anterior a aprovacao
+
+- Relacao analisada: mesma contratacao
+- O que divergiu: AM-17 Contract Amendment.pdf: data_de_execucao: 2026-04-10; Approval Index Q2.xlsx - linha 118: data_de_aprovacao: 2026-04-15
+- Por que pode importar: O ato pode ter comecado antes do fechamento formal da aprovacao.
+- Quanto confiamos neste sinal: alta
+- O que verificar: Por que a execucao aparece antes da aprovacao e qual data esta correta?
+
+#### S-02 - Aprovacao divergente
+
+- Relacao analisada: mesma contratacao
+- O que divergiu: AM-17 Contract Amendment.pdf: registrada; Approval Index Q2.xlsx - linha 118: pendente
+- Por que pode importar: A autorizacao do ato pode depender de uma comprovacao ainda nao conciliada.
+- Quanto confiamos neste sinal: alta
+- O que verificar: A aprovacao foi concluida e onde esta a comprovacao valida?
+
+#### S-03 - Situacao divergente
+
+- Relacao analisada: mesma contratacao
+- O que divergiu: AM-17 Contract Amendment.pdf: aprovado; Approval Index Q2.xlsx - linha 118: pendente
+- Por que pode importar: O conjunto nao apresenta uma situacao unica para o mesmo assunto.
+- Quanto confiamos neste sinal: alta
+- O que verificar: Qual e a situacao atual e qual registro tem autoridade para confirma-la?
+
+#### S-04 - Prazo divergente
+
+- Relacao analisada: mesma contratacao
+- O que divergiu: AM-17 Contract Amendment.pdf: 120; Approval Index Q2.xlsx - linha 118: 90
+- Por que pode importar: A execucao pode estar seguindo uma condicao diferente da que foi formalizada.
+- Quanto confiamos neste sinal: alta
+- O que verificar: Qual prazo esta vigente e qual documento formalizou a mudanca?
+
+#### S-05 - Responsavel divergente
+
+- Relacao analisada: mesma contratacao
+- O que divergiu: AM-17 Contract Amendment.pdf: Diretoria Comercial; Approval Index Q2.xlsx - linha 118: Diretoria Financeira
+- Por que pode importar: A atribuicao de responsabilidade pode nao estar clara ou uniforme.
+- Quanto confiamos neste sinal: alta
+- O que verificar: Quem era o responsavel valido por este ato no periodo analisado?
+
+#### S-06 - Documento mencionado nao encontrado
+
+- Relacao analisada: mesma contratacao
+- O que divergiu: AM-17 Contract Amendment.pdf: menciona APR-AM-17
+- Por que pode importar: Uma afirmacao relevante pode permanecer sem a comprovacao documental mencionada.
+- Quanto confiamos neste sinal: alta
+- O que verificar: Onde esta o documento mencionado e ele faz parte do lote analisado?
+
+#### S-07 - Procedimento diferente do padrao
+
+- Relacao analisada: documentos do mesmo grupo de procedimento
+- O que divergiu: Padrao observado em 3 documentos: solicitacao -> aprovacao -> assinatura; Emergency Exception Request 04.eml: solicitacao -> assinatura -> aprovacao
+- Por que pode importar: A empresa pode nao estar executando o mesmo processo de forma uniforme.
+- Quanto confiamos neste sinal: alta
+- O que verificar: Qual procedimento era o esperado e por que a sequencia mudou?
+
+#### S-08 - Quebra de padrao em aprovacao formal
+
+- Relacao analisada: documentos do mesmo grupo de procedimento
+- O que divergiu: Padrao observado em 3 documentos: sim; Emergency Exception Request 04.eml: nao
+- Por que pode importar: Um item equivalente segue comportamento diferente do padrao predominante.
+- Quanto confiamos neste sinal: alta
+- O que verificar: Por que este item segue um padrao diferente dos demais?
+
+#### S-09 - Quebra de padrao em assinatura
+
+- Relacao analisada: documentos do mesmo grupo de procedimento
+- O que divergiu: Padrao observado em 3 documentos: sim; Emergency Exception Request 04.eml: nao
+- Por que pode importar: Um item equivalente segue comportamento diferente do padrao predominante.
+- Quanto confiamos neste sinal: alta
+- O que verificar: Por que este item segue um padrao diferente dos demais?
 
 ### Hipoteses abertas pela investigacao
 
@@ -136,6 +221,14 @@ O lote analisado mostra um processo de compras documentado, mas as provas atuais
 - Recuperar a comprovacao de aprovacao para aditivos de alto valor.
 - Fechar as lacunas de diligencia documental para fornecedores estrategicos.
 - Padronizar os registros de excecao e reconciliar com as aprovacoes.
+- Por que a execucao aparece antes da aprovacao e qual data esta correta?
+- A aprovacao foi concluida e onde esta a comprovacao valida?
+- Qual e a situacao atual e qual registro tem autoridade para confirma-la?
+- Qual prazo esta vigente e qual documento formalizou a mudanca?
+- Quem era o responsavel valido por este ato no periodo analisado?
+- Onde esta o documento mencionado e ele faz parte do lote analisado?
+- Qual procedimento era o esperado e por que a sequencia mudou?
+- Por que este item segue um padrao diferente dos demais?
 
 ### Disciplina interna da analise
 

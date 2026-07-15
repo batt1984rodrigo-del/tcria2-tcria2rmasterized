@@ -14,6 +14,7 @@ def build_report_inventory(data: dict[str, Any]) -> dict[str, Any]:
         f"Origem declarada do material: {translate_client_text(normalized_text(data.get('source_description'), 'origem nao informada'))}.",
         f"Tipos de documento recebidos: {translate_client_text(normalized_text(data.get('document_types'), 'tipos nao informados'))}.",
         f"Registros de prova formal separados: {len(data.get('evidence_register') or [])}.",
+        f"Fichas estruturadas para comparacao: {len(data.get('correlation_documents') or [])}.",
         f"Pontos principais abertos pela analise: {len(data.get('findings') or [])}.",
     ]
     return {
@@ -21,6 +22,7 @@ def build_report_inventory(data: dict[str, Any]) -> dict[str, Any]:
         "document_count": int(data.get("documents_reviewed") or 0),
         "finding_count": len(data.get("findings") or []),
         "evidence_count": len(data.get("evidence_register") or []),
+        "correlation_document_count": len(data.get("correlation_documents") or []),
     }
 
 

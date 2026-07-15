@@ -59,7 +59,11 @@ Validation and document inventory
         ↓
 Direct extraction and OCR fallback
         ↓
-Facts, gaps and inconsistencies
+Comparable facts and document relationships
+        ↓
+Cross-document correlation, patterns and timeline
+        ↓
+Facts, gaps and investigation signals
         ↓
 Compliance findings linked to evidence
         ↓
@@ -121,6 +125,9 @@ TCRIA exists to do one main job:
 
 - receive a bounded document batch;
 - extract relevant content and signals;
+- correlate documents that belong to the same subject, process or event;
+- compare dates, values, deadlines, statuses, responsible parties and approvals;
+- identify pattern breaks and impossible temporal sequences;
 - identify compliance and conformity issues;
 - organize findings and evidence;
 - generate a structured compliance review report with a decision recommendation.
