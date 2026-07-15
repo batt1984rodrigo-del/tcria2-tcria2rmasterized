@@ -331,6 +331,10 @@ def build_report(payload: dict[str, Any]) -> dict[str, Any]:
             {
                 "file_name": file_name(item),
                 "classification": normalized_classification(item),
+                "summary": normalized_text(item.get("summary"), ""),
+                "classification_reasons": [
+                    str(reason).strip() for reason in (item.get("classification_reasons") or []) if str(reason).strip()
+                ],
                 "extraction_status": normalized_extraction_status(item),
                 "text_quality": normalized_text_quality(item),
                 "reading_method": normalized_reading_method(item),
