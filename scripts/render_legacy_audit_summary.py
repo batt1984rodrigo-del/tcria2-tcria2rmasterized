@@ -330,7 +330,13 @@ def build_report(payload: dict[str, Any]) -> dict[str, Any]:
         "documents": [
             {
                 "file_name": file_name(item),
+                "summary": normalized_text(item.get("summary")),
                 "classification": normalized_classification(item),
+                "classification_reasons": [
+                    normalized_text(reason)
+                    for reason in item.get("classification_reasons") or []
+                    if normalized_text(reason)
+                ],
                 "extraction_status": normalized_extraction_status(item),
                 "text_quality": normalized_text_quality(item),
                 "reading_method": normalized_reading_method(item),

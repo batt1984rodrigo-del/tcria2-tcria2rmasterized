@@ -8,6 +8,95 @@ from client_language import (
     translate_client_text,
 )
 
+INCONSISTENCY_TERMS = {
+    "inconsistent",
+    "discrepancy",
+    "mismatch",
+    "conflicting",
+    "not aligned",
+    "contradiction",
+    "divergente",
+    "divergência",
+    "contraditório",
+    "incompatível",
+    "versões diferentes",
+    "não corresponde",
+    "difere do",
+}
+
+EXCEPTION_TERMS = {
+    "exception",
+    "exception request",
+    "bypass",
+    "override",
+    "waiver",
+    "dispensa",
+    "dispensado",
+    "sem licitação",
+    "cotação dirigida",
+    "contratação direta",
+    "procedimento excepcional",
+    "a critério de",
+    "a seu exclusivo critério",
+}
+
+VAGUE_TERMS = {
+    "a combinar",
+    "a definir",
+    "sem data",
+    "prazo indefinido",
+    "valor a ser negociado",
+    "sem valor definido",
+    "sem responsável",
+    "conforme combinado",
+    "conforme discussão verbal",
+    "subject to change",
+    "as determined by",
+    "best effort",
+}
+
+FRAUD_TERMS = {
+    "único fornecedor",
+    "fornecedor homologado pela diretoria",
+    "split purchase",
+    "pagamento antecipado",
+    "pagamento em espécie",
+    "sem recibo",
+    "ghost vendor",
+    "front company",
+    "shell company",
+    "conflict of interest",
+    "undisclosed relationship",
+    "favoritism",
+    "bid rigging",
+    "kickback",
+}
+
+NO_ACCOUNTABILITY_TERMS = {
+    "sem responsável designado",
+    "isento de responsabilidade",
+    "não nos responsabilizamos",
+    "sem qualquer responsabilidade",
+    "limitation of liability",
+    "hold harmless",
+    "sob nenhuma hipótese",
+    "sem obrigação de",
+}
+
+TAMPERING_TERMS = {
+    "falsified",
+    "fabricated",
+    "altered",
+    "data retroativa",
+    "documento substituto",
+    "irregular pattern",
+    "assinatura divergente",
+    "cópia não autenticada",
+    "sem reconhecimento de firma",
+    "modified without",
+    "retroactive date",
+}
+
 
 def normalized_text(value: Any, default: str = "") -> str:
     text = str(value or "").strip()
