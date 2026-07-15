@@ -21,7 +21,7 @@ class ContradictionsEngineTests(unittest.TestCase):
                 "findings": [
                     {
                         "title": "Conflicting clauses and discrepancy in scope",
-                        "what_identified": "The appendix is not aligned and difere do texto principal.",
+                        "what_identified": "The appendix is not aligned; texto divergente, difere do texto principal.",
                         "why_matters": "This contradiction changes the obligation.",
                         "supporting_evidence": [],
                     },
