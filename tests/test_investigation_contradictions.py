@@ -108,7 +108,7 @@ class ContradictionsEngineTests(unittest.TestCase):
             ],
         )
 
-    def test_build_report_preserves_legacy_document_text_for_investigation(self) -> None:
+    def test_build_report_preserves_document_fields_for_contradiction_detection(self) -> None:
         payload = {
             "non_accusation_set": [
                 {

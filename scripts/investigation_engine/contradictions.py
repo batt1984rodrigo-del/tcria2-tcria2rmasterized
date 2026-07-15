@@ -90,9 +90,9 @@ def build_legacy_contradictions(report: dict[str, Any], hypotheses: list[dict[st
         items.append("Ha trechos do lote em que a leitura avancou mais do que a validacao tecnica conseguiu fechar.")
     if any(contains_any_term(haystack, INCONSISTENCY_TERMS) for haystack in document_haystacks):
         items.append("O documento apresenta trechos internamente divergentes ou incompatíveis.")
-    if contains_any_term(signals_haystack, EXCEPTION_TERMS) or any(
-        contains_any_term(haystack, EXCEPTION_TERMS) for haystack in document_haystacks
-    ):
+    if contains_any_term(signals_haystack, EXCEPTION_TERMS):
+        items.append("Foi identificada dispensa ou exceção de processo sem fundamentação formal clara.")
+    elif any(contains_any_term(haystack, EXCEPTION_TERMS) for haystack in document_haystacks):
         items.append("Foi identificada dispensa ou exceção de processo sem fundamentação formal clara.")
     if any(contains_any_term(haystack, VAGUE_TERMS) for haystack in document_haystacks):
         items.append("Partes do documento usam linguagem vaga onde deveriam existir valores ou prazos definidos.")
