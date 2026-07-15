@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import argparse
-import json
 from pathlib import Path
 from typing import Any
 
@@ -16,6 +15,7 @@ from client_language import (
     translate_client_text,
 )
 from client_output_validator import validate_client_markdown
+from shared_utils import load_json_object
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -23,10 +23,7 @@ DEFAULT_OUTPUT_DIR = ROOT / "output" / "legacy"
 
 
 def load_payload(path: Path) -> dict[str, Any]:
-    raw = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(raw, dict):
-        raise ValueError("Blocked artifacts review payload must be a JSON object.")
-    return raw
+    return load_json_object(path)
 
 
 def blocked_items(payload: dict[str, Any]) -> list[dict[str, Any]]:

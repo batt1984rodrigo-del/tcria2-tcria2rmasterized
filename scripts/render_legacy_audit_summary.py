@@ -15,6 +15,7 @@ from client_language import (
 )
 from client_output_validator import validate_client_markdown
 from reasoning_policy import build_legacy_reasoning_summary
+from shared_utils import normalized_text, render_investigation_section
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -57,11 +58,6 @@ def legacy_items(payload: dict[str, Any]) -> list[dict[str, Any]]:
     return [item for item in fallback if isinstance(item, dict)]
 
 
-def normalized_text(value: Any, default: str = "unknown") -> str:
-    text = str(value or "").strip()
-    return text if text else default
-
-
 def normalized_classification(item: dict[str, Any]) -> str:
     return normalized_text(item.get("classification"), "UNCLASSIFIED_LEGACY_ITEM").upper()
 
@@ -77,7 +73,7 @@ def normalized_extraction_status(item: dict[str, Any]) -> str:
 
 def normalized_text_quality(item: dict[str, Any]) -> str:
     quality = item.get("text_quality") or item.get("text_extraction_quality")
-    return normalized_text(quality).lower()
+    return normalized_text(quality, "unknown").lower()
 
 
 def normalized_outcome(item: dict[str, Any]) -> str:
@@ -186,7 +182,7 @@ def gate_status_counts(items: list[dict[str, Any]]) -> dict[str, int]:
         for gate in gates.values():
             if not isinstance(gate, dict):
                 continue
-            status = normalized_text(gate.get("status")).upper()
+            status = normalized_text(gate.get("status"), "unknown").upper()
             if status in counts:
                 counts[status] += 1
     return counts
@@ -203,7 +199,7 @@ def summarize_gates(item: dict[str, Any]) -> str:
         gate = gates.get(name)
         if not isinstance(gate, dict):
             continue
-        status = normalized_text(gate.get("status")).upper()
+        status = normalized_text(gate.get("status"), "unknown").upper()
         parts.append(f"{name}={status}")
     return "; ".join(parts) if parts else "not exposed in legacy item"
 
@@ -310,9 +306,9 @@ def build_report(payload: dict[str, Any]) -> dict[str, Any]:
     insufficient_text_count = sum(1 for item in items if has_insufficient_text(item))
     non_accusation_count = len([item for item in payload.get("non_accusation_set") or [] if isinstance(item, dict)])
     report = {
-        "generated_at": normalized_text(payload.get("generated_at")),
-        "audit_basis": normalized_text(payload.get("audit_basis")),
-        "mode": normalized_text(payload.get("mode") or payload.get("compliance_gate_mode")),
+        "generated_at": normalized_text(payload.get("generated_at"), "unknown"),
+        "audit_basis": normalized_text(payload.get("audit_basis"), "unknown"),
+        "mode": normalized_text(payload.get("mode") or payload.get("compliance_gate_mode"), "unknown"),
         "total_files_scanned": int(payload.get("total_files_scanned") or len(items)),
         "accusation_set_count": int(payload.get("accusation_set_count") or len(payload.get("accusation_set") or [])),
         "non_accusation_set_count": non_accusation_count,
@@ -422,50 +418,7 @@ def render_markdown(report: dict[str, Any]) -> str:
     for item in investigation["reading"]["items"]:
         lines.append(f"- {translate_client_text(item)}")
     lines.append("")
-    lines.append("### Hipoteses abertas pela investigacao")
-    lines.append("")
-    for item in investigation["hypotheses"]:
-        statement = translate_client_text(item["statement"]).rstrip(".")
-        lines.append(
-            f"- {item['hypothesis_id']}: {statement}. {translate_client_text(item['status_reason'])}"
-        )
-    lines.append("")
-    lines.append("### O que sustenta essas hipoteses")
-    lines.append("")
-    for item in investigation["evidence"]["summary_lines"]:
-        lines.append(f"- {translate_client_text(item)}")
-    for item in investigation["evidence"]["by_hypothesis"]:
-        evidence_lines = [translate_client_text(value) for value in item["evidence_lines"]]
-        joined_evidence = "; ".join(evidence_lines) if evidence_lines else "sem prova destacada nesta rodada"
-        lines.append(f"- {item['hypothesis_id']}: {joined_evidence}")
-    lines.append("")
-    lines.append("### O que nao bate")
-    lines.append("")
-    for item in investigation["contradictions"]["items"]:
-        lines.append(f"- {translate_client_text(item)}")
-    lines.append("")
-    lines.append("### O que esta faltando")
-    lines.append("")
-    for item in investigation["gaps"]["items"]:
-        lines.append(f"- {translate_client_text(item)}")
-    lines.append("")
-    lines.append("### O que podemos afirmar agora")
-    lines.append("")
-    lines.append(translate_client_text(investigation["conclusions"]["summary_statement"]))
-    lines.append("")
-    for item in investigation["conclusions"]["can_affirm"]:
-        lines.append(f"- {translate_client_text(item)}")
-    lines.append("")
-    lines.append("### O que ainda nao podemos afirmar")
-    lines.append("")
-    for item in investigation["conclusions"]["cannot_affirm_yet"]:
-        lines.append(f"- {translate_client_text(item)}")
-    lines.append("")
-    lines.append("### Proximos movimentos da investigacao")
-    lines.append("")
-    for item in investigation["recommendations"]["items"]:
-        lines.append(f"- {translate_client_text(item)}")
-    lines.append("")
+    render_investigation_section(lines, investigation, translate_client_text)
     lines.append("## 7. Pendencias e cautelas")
     lines.append(f"- Preservar incerteza: `{'sim' if reasoning['must_preserve_unknown'] else 'nao'}`")
     lines.append(f"- Pedir mais documentos: `{'sim' if reasoning['must_request_more_documents'] else 'nao'}`")

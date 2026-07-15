@@ -32,6 +32,7 @@ from client_language import (
 )
 from client_output_validator import validate_client_markdown
 from reasoning_policy import apply_reasoning_policy
+from shared_utils import render_investigation_section
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -178,38 +179,7 @@ def render_markdown(data: dict[str, Any]) -> str:
     lines.append("")
     lines.append(bullet_lines(client_list(investigation["reading"]["items"])))
     lines.append("")
-    lines.append("### Hipoteses abertas pela investigacao")
-    lines.append("")
-    lines.append("\n".join(investigation_lines(investigation["hypotheses"], "status_reason")))
-    lines.append("")
-    lines.append("### O que sustenta essas hipoteses")
-    lines.append("")
-    lines.append(bullet_lines(client_list(investigation["evidence"]["summary_lines"])))
-    lines.append("")
-    lines.append("\n".join(evidence_lines(investigation["evidence"]["by_hypothesis"])))
-    lines.append("")
-    lines.append("### O que nao bate")
-    lines.append("")
-    lines.append(bullet_lines(client_list(investigation["contradictions"]["items"])))
-    lines.append("")
-    lines.append("### O que esta faltando")
-    lines.append("")
-    lines.append(bullet_lines(client_list(investigation["gaps"]["items"])))
-    lines.append("")
-    lines.append("### O que podemos afirmar agora")
-    lines.append("")
-    lines.append(client_text(investigation["conclusions"]["summary_statement"]))
-    lines.append("")
-    lines.append(bullet_lines(client_list(investigation["conclusions"]["can_affirm"])))
-    lines.append("")
-    lines.append("### O que ainda nao podemos afirmar")
-    lines.append("")
-    lines.append(bullet_lines(client_list(investigation["conclusions"]["cannot_affirm_yet"])))
-    lines.append("")
-    lines.append("### Proximos movimentos da investigacao")
-    lines.append("")
-    lines.append(bullet_lines(client_list(investigation["recommendations"]["items"])))
-    lines.append("")
+    render_investigation_section(lines, investigation, client_text)
     lines.append("### Disciplina interna da analise")
     lines.append("")
     lines.append(client_text(data["rules_summary"]))
@@ -371,6 +341,25 @@ def severity_color(severity: str):
     return mapping.get(severity, colors.HexColor("#475569"))
 
 
+def _standard_table_style(font_size: float = 8.5, side_padding: int = 5) -> TableStyle:
+    return TableStyle(
+        [
+            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#0f172a")),
+            ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+            ("FONTNAME", (0, 1), (-1, -1), "Helvetica"),
+            ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#f8fafc")]),
+            ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#cbd5e1")),
+            ("FONTSIZE", (0, 0), (-1, -1), font_size),
+            ("VALIGN", (0, 0), (-1, -1), "TOP"),
+            ("LEFTPADDING", (0, 0), (-1, -1), side_padding),
+            ("RIGHTPADDING", (0, 0), (-1, -1), side_padding),
+            ("TOPPADDING", (0, 0), (-1, -1), 4),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+        ]
+    )
+
+
 def label_value_table(rows: list[list[str]], col_widths: list[float]) -> Table:
     table = Table(rows, colWidths=col_widths)
     table.setStyle(
@@ -433,24 +422,7 @@ def reading_summary_table(data: dict[str, Any]) -> Table:
         ["Regra de confianca", client_text(reading["reading_confidence_rule"])],
     ]
     table = Table(rows, colWidths=[54 * mm, 112 * mm], repeatRows=1)
-    table.setStyle(
-        TableStyle(
-            [
-                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#0f172a")),
-                ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-                ("FONTNAME", (0, 1), (-1, -1), "Helvetica"),
-                ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#f8fafc")]),
-                ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#cbd5e1")),
-                ("FONTSIZE", (0, 0), (-1, -1), 8.2),
-                ("VALIGN", (0, 0), (-1, -1), "TOP"),
-                ("LEFTPADDING", (0, 0), (-1, -1), 5),
-                ("RIGHTPADDING", (0, 0), (-1, -1), 5),
-                ("TOPPADDING", (0, 0), (-1, -1), 4),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
-            ]
-        )
-    )
+    table.setStyle(_standard_table_style(8.2))
     return table
 
 
@@ -467,24 +439,7 @@ def reading_register_table(data: dict[str, Any]) -> Table:
             ]
         )
     table = Table(rows, colWidths=[46 * mm, 24 * mm, 30 * mm, 22 * mm, 44 * mm], repeatRows=1)
-    table.setStyle(
-        TableStyle(
-            [
-                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#0f172a")),
-                ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-                ("FONTNAME", (0, 1), (-1, -1), "Helvetica"),
-                ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#f8fafc")]),
-                ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#cbd5e1")),
-                ("VALIGN", (0, 0), (-1, -1), "TOP"),
-                ("FONTSIZE", (0, 0), (-1, -1), 7.3),
-                ("LEFTPADDING", (0, 0), (-1, -1), 4),
-                ("RIGHTPADDING", (0, 0), (-1, -1), 4),
-                ("TOPPADDING", (0, 0), (-1, -1), 4),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
-            ]
-        )
-    )
+    table.setStyle(_standard_table_style(7.3, side_padding=4))
     return table
 
 
@@ -499,24 +454,7 @@ def reasoning_summary_table(data: dict[str, Any]) -> Table:
         ["Pontos que pedem documentos", str(reasoning["document_request_count"])],
     ]
     table = Table(rows, colWidths=[54 * mm, 112 * mm], repeatRows=1)
-    table.setStyle(
-        TableStyle(
-            [
-                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#0f172a")),
-                ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-                ("FONTNAME", (0, 1), (-1, -1), "Helvetica"),
-                ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#f8fafc")]),
-                ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#cbd5e1")),
-                ("FONTSIZE", (0, 0), (-1, -1), 8.2),
-                ("VALIGN", (0, 0), (-1, -1), "TOP"),
-                ("LEFTPADDING", (0, 0), (-1, -1), 5),
-                ("RIGHTPADDING", (0, 0), (-1, -1), 5),
-                ("TOPPADDING", (0, 0), (-1, -1), 4),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
-            ]
-        )
-    )
+    table.setStyle(_standard_table_style(8.2))
     return table
 
 
@@ -592,24 +530,7 @@ def evidence_table(data: dict[str, Any]) -> Table:
             ]
         )
     table = Table(rows, colWidths=[22 * mm, 52 * mm, 28 * mm, 76 * mm], repeatRows=1)
-    table.setStyle(
-        TableStyle(
-            [
-                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#0f172a")),
-                ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-                ("FONTNAME", (0, 1), (-1, -1), "Helvetica"),
-                ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#f8fafc")]),
-                ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#cbd5e1")),
-                ("VALIGN", (0, 0), (-1, -1), "TOP"),
-                ("FONTSIZE", (0, 0), (-1, -1), 7.8),
-                ("LEFTPADDING", (0, 0), (-1, -1), 4),
-                ("RIGHTPADDING", (0, 0), (-1, -1), 4),
-                ("TOPPADDING", (0, 0), (-1, -1), 4),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
-            ]
-        )
-    )
+    table.setStyle(_standard_table_style(7.8, side_padding=4))
     return table
 
 
