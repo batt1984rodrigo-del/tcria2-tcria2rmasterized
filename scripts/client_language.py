@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from shared_utils import normalized_text
+
 
 CLASSIFICATION_LABELS = {
     "ACCUSATORY_CANDIDATE": "Pode indicar problema",
@@ -20,11 +22,9 @@ ARTIFACT_TYPE_LABELS = {
     "ANALYTICAL_ARTIFACT": "Documento de analise",
     "DOSSIER": "Dossie",
     "FINANCIAL_EVIDENCE_BUNDLE": "Conjunto de provas financeiras",
-    "DECISION_ARTIFACT".lower(): "Documento de posicao",
-    "ANALYTICAL_ARTIFACT".lower(): "Documento de analise",
-    "dossier": "Dossie",
     "decision_artifact": "Documento de posicao",
     "analytical_artifact": "Documento de analise",
+    "dossier": "Dossie",
     "financial_evidence_bundle": "Conjunto de provas financeiras",
 }
 
@@ -185,11 +185,6 @@ CONTENT_LABEL_REPLACEMENTS = {
     "dates=": "datas=",
     "currency=": "valores=",
 }
-
-
-def normalized_text(value: Any, default: str = "") -> str:
-    text = str(value or "").strip()
-    return text if text else default
 
 
 def client_boolean(value: Any) -> str:

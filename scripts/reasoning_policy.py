@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from shared_utils import normalized_text
+
 
 POLICY_NAME = "generic_reasoning_policy"
 UNKNOWN_STATUSES = {"inconclusive", "unknown", "not_evaluated", "not evaluated"}
@@ -18,11 +20,6 @@ DOCUMENT_REQUEST_HINTS = {
     "record",
     "ratification",
 }
-
-
-def normalized_text(value: Any, default: str = "") -> str:
-    text = str(value or "").strip()
-    return text if text else default
 
 
 def normalized_list(value: Any) -> list[str]:

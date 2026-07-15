@@ -94,7 +94,6 @@ O relatorio nao esconde como cada documento foi lido.
 
 - As hipoteses atuais se apoiam em 9 referencia(s) descritas nos achados.
 - O registro formal de provas separado traz 3 itens adicionais para ancoragem.
-
 - H-01: Arquivo do aditivo contratual AM-17 sem anexo de aprovacao.; A planilha de controle de aprovacoes marca o registro como pendente.; A troca de e-mails menciona urgencia, mas nao mostra autorizacao final.
 - H-02: O checklist indica revisao fiscal e de sancoes como obrigatoria.; Tres pastas contem apenas formularios-resumo, sem os documentos de origem.; A planilha mestre de fornecedores lista esses terceiros como aprovados.
 - H-03: Dois memorandos usam o formulario padrao de excecao.; Um pedido esta sustentado apenas por linguagem em e-mail.; Nao existe um registro unico consolidando todas as excecoes emergenciais.
