@@ -34,7 +34,7 @@ def render_investigation_section(
     for item in investigation["evidence"]["summary_lines"]:
         lines.append(f"- {translate_fn(item)}")
     for item in investigation["evidence"]["by_hypothesis"]:
-        evidence = [translate_fn(v) for v in item.get("evidence_lines") or []]
+        evidence = [translate_fn(v) for v in item.get("evidence_lines", [])]
         joined = "; ".join(evidence) if evidence else "sem prova destacada nesta rodada"
         lines.append(f"- {item['hypothesis_id']}: {joined}")
     lines.append("")
