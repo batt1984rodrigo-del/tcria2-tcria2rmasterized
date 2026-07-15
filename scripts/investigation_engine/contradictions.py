@@ -15,6 +15,13 @@ from ._helpers import (
     normalized_text,
 )
 
+INCONSISTENCY_MESSAGE = "O documento apresenta trechos internamente divergentes ou incompatíveis."
+EXCEPTION_MESSAGE = "Foi identificada dispensa ou exceção de processo sem fundamentação formal clara."
+VAGUE_MESSAGE = "Partes do documento usam linguagem vaga onde deveriam existir valores ou prazos definidos."
+FRAUD_MESSAGE = "Há sinais de direcionamento ou irregularidade na seleção ou pagamento ao fornecedor."
+NO_ACCOUNTABILITY_MESSAGE = "O documento diluiu ou omitiu responsabilidades que deveriam estar claramente atribuídas."
+TAMPERING_MESSAGE = "Foram identificados sinais de possível adulteração ou irregularidade formal no documento."
+
 
 def contains_any_term(haystack: str, terms: set[str]) -> bool:
     return any(term in haystack for term in terms)
@@ -56,17 +63,17 @@ def build_report_contradictions(data: dict[str, Any], hypotheses: list[dict[str,
         if "only by email" in haystack or "only by email language" in haystack:
             items.append("Parte do que deveria estar formalizado aparece apenas em e-mail.")
         if contains_any_term(haystack, INCONSISTENCY_TERMS):
-            items.append("O documento apresenta trechos internamente divergentes ou incompatíveis.")
+            items.append(INCONSISTENCY_MESSAGE)
         if contains_any_term(haystack, EXCEPTION_TERMS):
-            items.append("Foi identificada dispensa ou exceção de processo sem fundamentação formal clara.")
+            items.append(EXCEPTION_MESSAGE)
         if contains_any_term(haystack, VAGUE_TERMS):
-            items.append("Partes do documento usam linguagem vaga onde deveriam existir valores ou prazos definidos.")
+            items.append(VAGUE_MESSAGE)
         if contains_any_term(haystack, FRAUD_TERMS):
-            items.append("Há sinais de direcionamento ou irregularidade na seleção ou pagamento ao fornecedor.")
+            items.append(FRAUD_MESSAGE)
         if contains_any_term(haystack, NO_ACCOUNTABILITY_TERMS):
-            items.append("O documento diluiu ou omitiu responsabilidades que deveriam estar claramente atribuídas.")
+            items.append(NO_ACCOUNTABILITY_MESSAGE)
         if contains_any_term(haystack, TAMPERING_TERMS):
-            items.append("Foram identificados sinais de possível adulteração ou irregularidade formal no documento.")
+            items.append(TAMPERING_MESSAGE)
 
     if not items and any(item.get("status") == "em aberto" for item in hypotheses):
         items.append("Ainda nao existe uma leitura uniforme o bastante para fechar todas as hipoteses do lote.")
@@ -89,13 +96,13 @@ def build_legacy_contradictions(report: dict[str, Any], hypotheses: list[dict[st
     if int((report.get("gate_counts") or {}).get("NOT_EVALUATED") or 0) > 0:
         items.append("Ha trechos do lote em que a leitura avancou mais do que a validacao tecnica conseguiu fechar.")
     if any(contains_any_term(haystack, INCONSISTENCY_TERMS) for haystack in document_haystacks):
-        items.append("O documento apresenta trechos internamente divergentes ou incompatíveis.")
+        items.append(INCONSISTENCY_MESSAGE)
     if contains_any_term(signals_haystack, EXCEPTION_TERMS):
-        items.append("Foi identificada dispensa ou exceção de processo sem fundamentação formal clara.")
+        items.append(EXCEPTION_MESSAGE)
     elif any(contains_any_term(haystack, EXCEPTION_TERMS) for haystack in document_haystacks):
-        items.append("Foi identificada dispensa ou exceção de processo sem fundamentação formal clara.")
+        items.append(EXCEPTION_MESSAGE)
     if any(contains_any_term(haystack, VAGUE_TERMS) for haystack in document_haystacks):
-        items.append("Partes do documento usam linguagem vaga onde deveriam existir valores ou prazos definidos.")
+        items.append(VAGUE_MESSAGE)
 
     if not items and any(item.get("status") == "em aberto" for item in hypotheses):
         items.append("A leitura atual ainda mistura material util com limites que impedem fechamento completo.")
