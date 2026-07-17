@@ -1,4 +1,7 @@
 tmp/
 incoming/*
 !incoming/README.md
+.env
+.env.*
+!.env.example
 .DS_Store
