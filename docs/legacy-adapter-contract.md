@@ -4,6 +4,7 @@ This document defines how legacy TCRIA audit output should enter the remodeled r
 
 Reference artifacts:
 
+- sanitized legacy producer: [../scripts/audit_accusation_bundle_with_tcr_gateway.py](../scripts/audit_accusation_bundle_with_tcr_gateway.py)
 - legacy sample input: [../examples/legacy/sanitized-strict-audit.json](../examples/legacy/sanitized-strict-audit.json)
 - adapted Markdown example: [../output/legacy/legacy-audit-summary.md](../output/legacy/legacy-audit-summary.md)
 - coverage and provenance notes: [./coverage-and-provenance.md](./coverage-and-provenance.md)
@@ -14,9 +15,45 @@ Legacy output enters through translation.
 
 The official path is:
 
-`legacy JSON -> normalizer -> structured Markdown`
+`explicit document batch -> sanitized legacy producer -> legacy JSON -> normalizer -> structured Markdown`
 
 The repository should not import the old engine wholesale as the first integration step.
+
+## Sanitized Pipeline Producer
+
+The repository includes a cleaned, case-independent version of the legacy
+motor at `scripts/audit_accusation_bundle_with_tcr_gateway.py`.
+
+It preserves the useful legacy behavior while removing:
+
+- hardcoded user and workspace paths;
+- automatic scanning of personal download folders;
+- names of people, institutions and case files;
+- case-specific target terms;
+- default exposure of absolute source paths;
+- reading of files whose names indicate credentials or secrets.
+
+The producer requires an explicit input path and accepts case-specific terms at
+runtime instead of storing them in source code.
+
+Example:
+
+```bash
+python3 scripts/audit_accusation_bundle_with_tcr_gateway.py \
+  --path /path/to/sanitized-batch \
+  --target-term "entity identifier" \
+  --output-dir output/pipeline \
+  --output-stem case-audit
+```
+
+The output JSON is compatible with `scripts/render_legacy_audit_summary.py`.
+
+The reading sequence is:
+
+1. use direct extraction when usable text already exists;
+2. attempt OCR only when direct PDF extraction fails or returns no usable text;
+3. record `reading_method`, `ocr_status` and `reading_confidence` in every item;
+4. preserve unreadable and OCR-failed files in the output instead of hiding them.
 
 ## Adapter Objective
 
