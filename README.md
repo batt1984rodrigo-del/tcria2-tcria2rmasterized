@@ -187,6 +187,16 @@ The current repository foundation assumes:
 - [Non-Goals](docs/non-goals.md)
 - [Contributing](CONTRIBUTING.md)
 
+## Local secret placeholder
+
+This repository now reserves a local placeholder for future OpenAI integration.
+
+1. Copy `.env.example` to `.env`.
+2. Fill `OPENAI_API_KEY` only in your local file or environment.
+3. Never commit real keys or other secrets to the repository.
+
+The current repository does not use this key automatically yet; the placeholder exists only to prepare a safe configuration path.
+
 ## Current Repository Focus
 
 The current work in this repository is to define TCRIA objectively as a product:
