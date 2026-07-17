@@ -19,16 +19,44 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install dependencies
+      - name: Install document reading tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes poppler-utils tesseract-ocr tesseract-ocr-por
+
+      - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install reportlab
+          python -m pip install --requirement requirements.txt
+
+      - name: Compile Python sources
+        run: |
+          python -m compileall -q scripts tests
+
+      - name: Run automated tests
+        run: |
+          python -m unittest discover --start-directory tests --verbose
 
       - name: Render example report
         run: |
           python scripts/render_report_example.py
 
+      - name: Run sanitized legacy pipeline
+        run: |
+          python scripts/audit_accusation_bundle_with_tcr_gateway.py \
+            --path docs/report-example.md \
+            --path output/pdf/tcria-compliance-report-example.pdf \
+            --strict \
+            --output-dir tmp/ci-legacy-pipeline \
+            --output-stem ci-legacy-audit
+          python scripts/render_legacy_audit_summary.py \
+            --input tmp/ci-legacy-pipeline/ci-legacy-audit_strict.json \
+            --output tmp/ci-legacy-pipeline/ci-legacy-audit-summary.md
+
       - name: Verify report artifacts
         run: |
           test -f docs/report-example.md
           test -f output/pdf/tcria-compliance-report-example.pdf
+          test -f tmp/ci-legacy-pipeline/ci-legacy-audit_strict.json
+          test -f tmp/ci-legacy-pipeline/ci-legacy-audit_strict.md
+          test -f tmp/ci-legacy-pipeline/ci-legacy-audit-summary.md
