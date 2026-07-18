@@ -5,3 +5,9 @@ incoming/*
 .env.*
 !.env.example
 .DS_Store
+.env
+.env.local
+.env.*.local
+tcria_jobs/
+__pycache__/
+*.py[cod]

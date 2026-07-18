@@ -211,3 +211,32 @@ The current work in this repository is to define TCRIA objectively as a product:
 - how imperfect material is handled;
 - what requires human validation;
 - what remains outside the MVP.
+
+## Run the deployment application locally
+
+The first deployable vertical receives a bounded multi-file batch, validates and safely expands supported ZIPs, runs the existing Python pipeline, optionally synthesizes the result through the OpenAI Responses API, and produces HTML, PDF and JSON artifacts.
+
+Requirements:
+
+- Python 3.11;
+- Poppler;
+- Tesseract with Portuguese language support.
+
+Setup and run:
+
+```bash
+python3.11 -m pip install --requirement requirements.txt
+cp -n .env.example .env.local
+uvicorn app.main:app --reload
+```
+
+Configure `OPENAI_API_KEY` and a non-placeholder `TCRIA_PILOT_TOKEN` in `.env.local`. Open `http://127.0.0.1:8000` and use the pilot credential in the form. If the OpenAI integration is unavailable, TCRIA still produces an explicitly labeled deterministic report instead of presenting model-generated conclusions.
+
+Run with Docker:
+
+```bash
+docker build --tag tcria .
+docker run --rm --publish 8000:8000 --env-file .env.local tcria
+```
+
+Uploaded material and private generated artifacts are stored under `TCRIA_JOB_ROOT`, isolated by analysis identifier, and expire after 24 hours by default. The application never uses the repository itself as an upload destination.

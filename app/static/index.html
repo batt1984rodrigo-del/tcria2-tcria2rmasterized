@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>TCRIA — Revisão documental</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header><a class="brand" href="/">TCRIA</a><span>Revisão documental de conformidade</span></header>
+  <main>
+    <section class="intro">
+      <p class="eyebrow">Lote delimitado · evidência rastreável</p>
+      <h1>Transforme documentos em uma recomendação que possa ser revisada.</h1>
+      <p>Envie até 20 arquivos, formule a decisão em análise e acompanhe leitura, OCR e correlação até o relatório.</p>
+    </section>
+    <section class="panel" id="form-panel">
+      <form id="analysis-form">
+        <label for="token">Credencial do piloto <span>quando exigida</span></label>
+        <input id="token" type="password" autocomplete="current-password" placeholder="Credencial">
+        <label for="question">Qual decisão precisa ser tomada?</label>
+        <textarea id="question" name="question" minlength="10" maxlength="2000" required placeholder="Ex.: Este fornecedor pode ser aprovado com os documentos apresentados?"></textarea>
+        <label class="drop" for="files">
+          <strong>Selecione ou arraste o lote documental</strong>
+          <span>PDF, DOCX, TXT, MD ou ZIP · até 20 arquivos · 100 MB</span>
+          <input id="files" name="files" type="file" accept=".pdf,.docx,.txt,.md,.zip" multiple required>
+        </label>
+        <ul id="file-list" class="file-list"></ul>
+        <button type="submit">Iniciar análise</button>
+        <p class="retention">Os arquivos temporários são removidos automaticamente após 24 horas.</p>
+      </form>
+    </section>
+    <section class="panel hidden" id="status-panel" aria-live="polite">
+      <p class="eyebrow">Análise em andamento</p>
+      <h2 id="stage">Preparando o lote</h2>
+      <div class="progress"><span id="progress"></span></div>
+      <p id="status-copy">A conexão pode ser fechada; o trabalho continua no servidor.</p>
+    </section>
+    <section class="panel hidden" id="result-panel">
+      <p class="eyebrow">Recomendação para revisão humana</p>
+      <h2 id="decision"></h2>
+      <p id="rationale"></p>
+      <div class="result-grid">
+        <article><h3>Fatos confirmados</h3><ul id="facts"></ul></article>
+        <article><h3>Lacunas</h3><ul id="gaps"></ul></article>
+        <article><h3>Sinais para verificação</h3><ul id="signals"></ul></article>
+        <article><h3>Limitações</h3><ul id="limitations"></ul></article>
+      </div>
+      <div class="downloads"><a id="pdf-link">Baixar PDF</a><a id="html-link">Abrir HTML</a><a id="json-link">Baixar JSON</a></div>
+    </section>
+    <p id="error" class="error hidden" role="alert"></p>
+  </main>
+  <script src="/app.js" defer></script>
+</body>
+</html>
